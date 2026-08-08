@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3d3229">
+<title>The Turner Story — English by the Nature Method</title>
+<style>
+  :root{
+    --bg:#f3ecdd; --paper:#fffdf8; --ink:#2b2620; --muted:#8a7f6d; --border:#e4dbc8;
+    --accent:#a8562c; --accent2:#3f7a5c; --warn:#c98a1d; --bad:#b8443a; --gold:#d9a441;
+    --s1:#c96b3f; --s2:#3f6a8f; --s3:#2f8f7f;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{margin:0; font-family:Georgia,'Times New Roman',serif; background:var(--bg); color:var(--ink); padding-bottom:70px;
+    background-image:radial-gradient(circle at 20% 10%, rgba(255,255,255,0.6), transparent 40%);}
+  .sans{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+  .screen{display:none; padding:20px 16px 26px; max-width:600px; margin:0 auto; animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  @keyframes pop{0%{transform:scale(.85);} 60%{transform:scale(1.05);} 100%{transform:scale(1);}}
+  @keyframes wiggle{0%,100%{transform:rotate(0);} 25%{transform:rotate(-4deg);} 75%{transform:rotate(4deg);}}
+  h1{font-size:1.4rem; margin:6px 0 4px; font-weight:700;}
+  h2{font-size:1.1rem; margin:0 0 10px; font-weight:700;}
+  .sub{color:var(--muted); font-size:0.86rem; margin:0 0 18px;}
+  .hero{background:linear-gradient(135deg,#5a4636,#33281f); border-radius:20px; padding:22px; margin-bottom:18px;
+    box-shadow:0 10px 26px rgba(60,40,20,0.25); position:relative; overflow:hidden;}
+  .hero h1{color:#fdf6e8; margin:0 0 4px;}
+  .hero p{color:#e6d9c2; margin:0; font-size:0.86rem;}
+  .hero-badge{position:absolute; right:-10px; top:-10px; font-size:3.2rem; opacity:0.18; transform:rotate(12deg);}
+  .card{background:var(--paper); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px; box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+  .btn{display:block; width:100%; text-align:center; background:linear-gradient(135deg,var(--accent),#8a4322); color:#fff; border:none; border-radius:10px;
+    padding:13px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:8px; box-shadow:0 4px 12px rgba(168,86,44,0.3);}
+  .btn.secondary{background:transparent; box-shadow:none; border:1px solid var(--border); color:var(--ink);}
+  .btn.small{padding:8px 12px; font-size:0.8rem; width:auto; display:inline-block; box-shadow:none;}
+  .btn:active{transform:scale(0.98);}
+
+  /* Story map */
+  .map-wrap{position:relative; padding:6px 0 10px;}
+  .series-title{font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; margin:22px 0 12px; display:flex; align-items:center; gap:8px;}
+  .series-title .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .map-path{display:flex; flex-direction:column; gap:2px; position:relative; padding-left:6px;}
+  .map-node{display:flex; align-items:center; gap:12px; position:relative; padding:8px 0; cursor:pointer;}
+  .map-node.locked{cursor:not-allowed; opacity:0.42;}
+  .map-node::before{content:""; position:absolute; left:20px; top:-14px; width:2px; height:14px; background:var(--border);}
+  .map-node:first-child::before{display:none;}
+  .map-circle{width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; border:3px solid var(--border); background:#fff; position:relative; z-index:1;}
+  .map-circle.done{background:var(--accent2); border-color:var(--accent2); color:#fff;}
+  .map-circle.current{border-color:var(--gold); box-shadow:0 0 0 4px rgba(217,164,65,0.25); animation:pop .6s ease;}
+  .map-info .title{font-weight:700; font-size:0.9rem;}
+  .map-info .meta{color:var(--muted); font-size:0.74rem; margin-top:1px;}
+  .series-badge{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--gold); color:#8a6d1f;
+    padding:4px 10px; border-radius:99px; font-size:0.72rem; font-weight:700; margin-top:6px;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;}
+  .stat{background:var(--paper); border:1px solid var(--border); border-radius:12px; padding:10px 6px; text-align:center;}
+  .stat .num{font-size:1.25rem; font-weight:800; color:var(--accent);}
+  .stat .label{color:var(--muted); font-size:0.63rem; margin-top:2px;}
+
+  /* Chapter reader */
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;}
+  .back{background:none; border:none; color:var(--accent); font-size:0.95rem; cursor:pointer; padding:6px 0; font-weight:600;}
+  .illustration-frame{border-radius:16px; overflow:hidden; border:1px solid var(--border); margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,0.08);}
+  .illustration-frame svg{display:block; width:100%; height:auto;}
+  .cast-strip{display:flex; gap:10px; margin-bottom:16px; overflow-x:auto; padding-bottom:2px;}
+  .cast-chip{display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:52px;}
+  .cast-chip svg{width:40px; height:40px; border-radius:50%; background:#fff; border:2px solid var(--border);}
+  .cast-chip span{font-size:0.62rem; color:var(--muted); margin-top:3px; text-align:center;}
+  .story-text{font-size:1.1rem; line-height:1.85;}
+  .story-text p{margin:0 0 16px;}
+  .gloss{background:#f3ead9; padding:1px 4px; border-radius:4px; border-bottom:2px dotted var(--accent); cursor:pointer; font-weight:600;}
+  .gloss-popup{display:none; background:#2b2620; color:#fff; font-family:-apple-system,sans-serif; font-size:0.8rem;
+    padding:8px 12px; border-radius:8px; margin:6px 0; line-height:1.4;}
+  .gloss-popup.show{display:block; animation:fade .15s ease;}
+  .spotlight{background:#fff7e6; border:1px dashed var(--gold); border-radius:12px; padding:12px 14px; margin:18px 0;
+    font-size:0.86rem; line-height:1.55;}
+  .spotlight b{color:#8a6d1f;}
+  .spotlight .label{font-weight:700; color:#8a6d1f; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; display:block;}
+  .grammar-note{background:#eef4ee; border-left:4px solid var(--accent2); border-radius:10px; padding:14px 16px; margin:18px 0; font-size:0.88rem; line-height:1.6;}
+  .grammar-note h3{margin:0 0 6px; font-size:0.85rem; color:var(--accent2); text-transform:uppercase; letter-spacing:0.03em;}
+  .listen-btn{background:linear-gradient(135deg,var(--accent2),#2c5c46); color:#fff; border:none; border-radius:10px; padding:9px 16px; font-size:0.82rem;
+    font-weight:700; cursor:pointer; box-shadow:0 3px 10px rgba(63,122,92,0.3);}
+  .listen-btn.playing{animation:wiggle 0.8s ease infinite;}
+
+  .tab-row{display:flex; gap:6px; margin-bottom:16px;}
+  .tab-btn{flex:1; padding:9px 4px; border-radius:10px; border:1px solid var(--border); background:var(--paper);
+    font-size:0.76rem; font-weight:700; cursor:pointer; color:var(--muted);}
+  .tab-btn.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+  .vocab-list{font-size:0.86rem;}
+  .vocab-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border);}
+  .vocab-row:last-child{border-bottom:none;}
+  .vocab-emoji{font-size:1.3rem; width:30px; text-align:center;}
+  .vocab-word{font-weight:700; color:var(--accent);}
+  .vocab-def{color:var(--muted); margin-top:2px; font-size:0.8rem;}
+  .vocab-actions{margin-left:auto; display:flex; gap:4px;}
+  .icon-btn{border:none; background:#f3ead9; border-radius:8px; padding:5px 8px; font-size:0.85rem; cursor:pointer;}
+  .icon-btn.active-yes{background:#dcf1e6;}
+  .icon-btn.active-no{background:#fbe4e1;}
+
+  /* Matching game */
+  .match-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px;}
+  .match-tile{background:#fff; border:2px solid var(--border); border-radius:12px; padding:12px 6px; text-align:center;
+    font-size:0.82rem; cursor:pointer; min-height:56px; display:flex; align-items:center; justify-content:center; font-weight:600;}
+  .match-tile .emoji{font-size:1.4rem; display:block; margin-bottom:2px;}
+  .match-tile.selected{border-color:var(--gold); background:#fff7e6;}
+  .match-tile.matched{border-color:var(--accent2); background:#e8f5ee; opacity:0.55; cursor:default;}
+  .match-status{text-align:center; font-size:0.8rem; color:var(--muted); margin:10px 0;}
+
+  .section-label{font-weight:700; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted);
+    margin:22px 0 8px; border-top:1px solid var(--border); padding-top:16px;}
+  .exercise-block{}
+  .blank-sentence{font-size:0.98rem; line-height:1.9; margin-bottom:16px;}
+  select.blank{font-size:0.86rem; padding:3px 6px; border-radius:6px; border:2px solid var(--accent); background:#fff; color:var(--ink); margin:0 2px;}
+  select.blank.correct{border-color:var(--accent2); background:#e8f5ee;}
+  select.blank.wrong{border-color:var(--bad); background:#fbe9e7;}
+  .q-item{margin-bottom:16px;}
+  .q-item .q{font-weight:600; margin-bottom:6px; font-size:0.9rem;}
+  .q-item textarea{width:100%; border:1px solid var(--border); border-radius:8px; padding:8px; font-family:inherit; font-size:0.88rem; min-height:50px;}
+  .reveal-btn{font-size:0.78rem; color:var(--accent); background:none; border:none; cursor:pointer; padding:4px 0; font-weight:600;}
+  .model-answer{display:none; background:#f3ead9; padding:8px 10px; border-radius:8px; font-size:0.84rem; margin-top:6px;}
+  .model-answer.show{display:block;}
+  .mc-item{margin-bottom:14px;}
+  .mc-item .prompt{font-size:0.9rem; margin-bottom:8px; font-weight:600;}
+  .mc-opt{display:block; width:100%; text-align:left; background:#fff; border:1px solid var(--border); border-radius:8px;
+    padding:10px 12px; margin-bottom:6px; font-size:0.86rem; cursor:pointer;}
+  .mc-opt.correct{border-color:var(--accent2); background:#e8f5ee;}
+  .mc-opt.wrong{border-color:var(--bad); background:#fbe9e7;}
+
+  .navbar{position:fixed; bottom:0; left:0; right:0; background:rgba(255,253,248,0.97); backdrop-filter:blur(6px); border-top:1px solid var(--border);
+    display:flex; padding:8px 4px calc(8px + env(safe-area-inset-bottom));}
+  .navbar button{flex:1; background:none; border:none; color:var(--muted); font-size:0.62rem; padding:6px 0; cursor:pointer; font-weight:600;}
+  .navbar button.active{color:var(--accent);}
+  .navbar .icon{font-size:1.25rem; display:block;}
+
+  .progressbar{height:8px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:16px;}
+  .progressbar-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--gold)); border-radius:99px; transition:width .35s;}
+  .empty{color:var(--muted); font-size:0.88rem; text-align:center; padding:20px 0;}
+
+  .badge-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .badge{background:#fff7e6; border:1px solid var(--gold); color:#8a6d1f; padding:6px 12px; border-radius:99px; font-size:0.78rem; font-weight:700;}
+
+  /* Celebration overlay */
+  #celebrate-overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:999; pointer-events:none;}
+  #celebrate-overlay.show{display:flex;}
+  .confetti-piece{position:absolute; top:-20px; width:8px; height:14px; opacity:0.9; animation:confettiFall linear forwards;}
+  @keyframes confettiFall{ to { transform:translateY(110vh) rotate(540deg); opacity:0.2; } }
+  .celebrate-card{background:#fff; border-radius:18px; padding:28px 24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.25);
+    animation:pop .4s ease; max-width:320px;}
+  .celebrate-card .big{font-size:3rem;}
+  .celebrate-card h3{margin:8px 0 4px; font-size:1.15rem;}
+  .celebrate-card p{color:var(--muted); font-size:0.85rem; margin:0 0 14px;}
+</style>
+</head>
+<body class="sans">
+
+<div id="celebrate-overlay"></div>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="hero-badge">📖</div>
+    <h1>The Turner Story</h1>
+    <p>An illustrated Nature Method course — no translation, one continuous story, from A2 to B2.</p>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="num" id="stat-chapters">0/15</div><div class="label">Chapters</div></div>
+    <div class="stat"><div class="num" id="stat-words">0</div><div class="label">Words Known</div></div>
+    <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">🔥 Day Streak</div></div>
+  </div>
+  <div id="series-list"></div>
+</div>
+
+<!-- CHAPTER READ -->
+<div class="screen" id="screen-chapter">
+  <div class="topbar">
+    <button class="back" onclick="exitChapter()">← Back</button>
+    <button class="listen-btn" id="listen-btn" onclick="playChapterAudio()">🔊 Listen</button>
+  </div>
+  <h1 id="ch-title"></h1>
+  <p class="sub" id="ch-meta"></p>
+  <div class="tab-row">
+    <button class="tab-btn active" data-tab="read" onclick="switchTab('read')">📖 Story</button>
+    <button class="tab-btn" data-tab="vocab" onclick="switchTab('vocab')">🗂 Words</button>
+    <button class="tab-btn" data-tab="play" onclick="switchTab('play')">🎮 Play</button>
+    <button class="tab-btn" data-tab="exercises" onclick="switchTab('exercises')">✏️ Exercises</button>
+  </div>
+  <div id="tab-read"></div>
+  <div id="tab-vocab" style="display:none;"></div>
+  <div id="tab-play" style="display:none;"></div>
+  <div id="tab-exercises" style="display:none;"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="screen" id="screen-progress">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">← Back</button></div>
+  <h1>📊 My Progress</h1>
+  <div class="card">
+    <h2>Badges</h2>
+    <div class="badge-row" id="badge-row"></div>
+  </div>
+  <div class="card">
+    <h2>Words I've Learned</h2>
+    <div id="progress-words" class="vocab-list"></div>
+  </div>
+  <div class="card">
+    <h2>Completed Chapters</h2>
+    <div id="progress-chapters" class="vocab-list"></div>
+  </div>
+</div>
+
+<div class="navbar">
+  <button onclick="showScreen('home')" data-nav="home"><span class="icon">🏠</span>Story</button>
+  <button onclick="showScreen('progress')" data-nav="progress"><span class="icon">📊</span>Progress</button>
+</div>
+
+<script>
+/* ================= SVG SPRITE LIBRARY ================= */
+let gradSeq = 0;
+function nextId(){ gradSeq++; return "g"+gradSeq; }
+function sky(topColor, bottomColor){
+  const id = nextId();
+  return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="${topColor}"/><stop offset="100%" stop-color="${bottomColor}"/>
+  </linearGradient></defs><rect x="0" y="0" width="400" height="200" fill="url(#${id})"/>`;
+}
+function sun(cx,cy){ return `<circle cx="${cx}" cy="${cy}" r="18" fill="#f6cf5e"/><circle cx="${cx}" cy="${cy}" r="24" fill="#f6cf5e" opacity="0.3"/>`; }
+function moon(cx,cy){ return `<circle cx="${cx}" cy="${cy}" r="14" fill="#f3ecc9"/>`; }
+function starField(){ let s=""; const pts=[[40,25],[90,15],[150,35],[260,20],[320,40],[360,15]]; pts.forEach(p=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#fff"/>`;}); return s; }
+function cloud(cx,cy){ return `<g fill="#ffffff" opacity="0.85"><ellipse cx="${cx}" cy="${cy}" rx="20" ry="10"/><ellipse cx="${cx+16}" cy="${cy+3}" rx="14" ry="8"/><ellipse cx="${cx-16}" cy="${cy+4}" rx="13" ry="7"/></g>`; }
+function ground(y,color){ return `<rect x="0" y="${y}" width="400" height="${200-y}" fill="${color}"/>`; }
+function tree(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-3" y="0" width="6" height="18" fill="#7a5230"/>
+    <circle cx="0" cy="-8" r="16" fill="#5c9a5c"/><circle cx="-10" cy="-2" r="11" fill="#4f8a4f"/><circle cx="10" cy="-2" r="11" fill="#4f8a4f"/>
+  </g>`; }
+function flower(x,y,color){ return `<g transform="translate(${x},${y})">
+    <rect x="-1" y="0" width="2" height="10" fill="#4f8a4f"/>
+    <circle cx="0" cy="-3" r="4" fill="${color}"/><circle cx="-4" cy="0" r="3" fill="${color}"/><circle cx="4" cy="0" r="3" fill="${color}"/>
+  </g>`; }
+function house(x,y,scale,wall,roof){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-40" y="-40" width="80" height="50" fill="${wall}"/>
+    <polygon points="-48,-40 0,-72 48,-40" fill="${roof}"/>
+    <rect x="-12" y="-20" width="20" height="30" fill="#7a5230"/>
+    <rect x="-32" y="-32" width="14" height="14" fill="#dff0f7" stroke="#5c4a38" stroke-width="1.5"/>
+    <rect x="14" y="-32" width="14" height="14" fill="#dff0f7" stroke="#5c4a38" stroke-width="1.5"/>
+  </g>`; }
+function office(x,y,scale,color){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-46" y="-100" width="92" height="100" fill="${color}"/>
+    ${[0,1,2,3].map(r=>[0,1,2,3].map(c=>`<rect x="${-38+c*22}" y="${-92+r*22}" width="14" height="14" fill="#cfe4f2" opacity="0.9"/>`).join('')).join('')}
+  </g>`; }
+function person(x,y,scale,opts){
+  scale=scale||1; opts=opts||{};
+  const skin=opts.skin||"#e8b98a", shirt=opts.shirt||"#3f6a8f", legs=opts.legs||"#43382d", hair=opts.hair||"#4a3324";
+  let hairShape = "";
+  if(opts.hairStyle==="pigtails"){
+    hairShape = `<circle cx="-9" cy="-40" r="5" fill="${hair}"/><circle cx="9" cy="-40" r="5" fill="${hair}"/><path d="M-10,-46 Q0,-54 10,-46 Q10,-40 0,-40 Q-10,-40 -10,-46 Z" fill="${hair}"/>`;
+  } else if(opts.hairStyle==="long"){
+    hairShape = `<path d="M-13,-46 Q0,-56 13,-46 L13,-30 Q0,-34 -13,-30 Z" fill="${hair}"/>`;
+  } else {
+    hairShape = `<path d="M-12,-46 Q0,-56 12,-46 Q13,-40 0,-40 Q-13,-40 -12,-46 Z" fill="${hair}"/>`;
+  }
+  return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-7" y="-8" width="6" height="18" fill="${legs}"/><rect x="1" y="-8" width="6" height="18" fill="${legs}"/>
+    <rect x="-13" y="-30" width="26" height="24" rx="6" fill="${shirt}"/>
+    <circle cx="0" cy="-40" r="11" fill="${skin}"/>
+    ${hairShape}
+  </g>`;
+}
+function dog(x,y,scale,color){ scale=scale||1; color=color||"#b5793a"; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <ellipse cx="0" cy="-8" rx="16" ry="9" fill="${color}"/>
+    <circle cx="16" cy="-14" r="8" fill="${color}"/>
+    <ellipse cx="20" cy="-19" rx="3" ry="6" fill="${color}" transform="rotate(20 20 -19)"/>
+    <path d="M-15,-4 Q-22,6 -14,10" stroke="${color}" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <rect x="-11" y="-2" width="4" height="9" fill="${color}"/><rect x="6" y="-2" width="4" height="9" fill="${color}"/>
+  </g>`; }
+function busShape(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-45" y="-30" width="90" height="34" rx="6" fill="#c94f3e"/>
+    <rect x="-38" y="-24" width="18" height="14" fill="#dff0f7"/><rect x="-14" y="-24" width="18" height="14" fill="#dff0f7"/>
+    <rect x="10" y="-24" width="18" height="14" fill="#dff0f7"/>
+    <circle cx="-28" cy="6" r="7" fill="#2b2620"/><circle cx="28" cy="6" r="7" fill="#2b2620"/>
+  </g>`; }
+function trainShape(x,y,scale,color){ scale=scale||1; color=color||"#3f6a8f"; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-70" y="-40" width="140" height="42" rx="10" fill="${color}"/>
+    ${[0,1,2,3].map(i=>`<rect x="${-58+i*36}" y="-32" width="22" height="16" fill="#dff0f7"/>`).join('')}
+    <circle cx="-45" cy="6" r="9" fill="#2b2620"/><circle cx="0" cy="6" r="9" fill="#2b2620"/><circle cx="45" cy="6" r="9" fill="#2b2620"/>
+  </g>`; }
+function suitcase(x,y,scale,color){ scale=scale||1; color=color||"#a8562c"; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-16" y="-22" width="32" height="24" rx="4" fill="${color}"/>
+    <rect x="-6" y="-28" width="12" height="8" rx="2" fill="none" stroke="${color}" stroke-width="3"/>
+    <rect x="-16" y="-12" width="32" height="3" fill="#3d2c1e"/>
+  </g>`; }
+function museumFacade(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <polygon points="-70,-56 0,-84 70,-56" fill="#d8cba8"/>
+    <rect x="-72" y="-56" width="144" height="12" fill="#c7b98e"/>
+    ${[-55,-33,-11,11,33,55].map(cx=>`<rect x="${cx-6}" y="-44" width="12" height="44" fill="#eee3c8"/>`).join('')}
+    <rect x="-72" y="-2" width="144" height="8" fill="#b6a67c"/>
+  </g>`; }
+function statueShape(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-16" y="-4" width="32" height="10" fill="#9c9c9c"/>
+    <rect x="-6" y="-42" width="12" height="38" fill="#bdbdbd"/>
+    <circle cx="0" cy="-48" r="8" fill="#bdbdbd"/>
+  </g>`; }
+function clockTower(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-10" y="-90" width="20" height="90" fill="#8a7f6d"/>
+    <rect x="-16" y="-102" width="32" height="14" fill="#6e6353"/>
+    <circle cx="0" cy="-70" r="10" fill="#fdf6e8" stroke="#3d2c1e" stroke-width="2"/>
+    <line x1="0" y1="-70" x2="0" y2="-76" stroke="#3d2c1e" stroke-width="1.5"/>
+    <line x1="0" y1="-70" x2="5" y2="-68" stroke="#3d2c1e" stroke-width="1.5"/>
+  </g>`; }
+function cafeTable(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <ellipse cx="0" cy="0" rx="22" ry="6" fill="#8a7f6d"/>
+    <rect x="-3" y="-22" width="6" height="22" fill="#8a7f6d"/>
+    <ellipse cx="0" cy="-22" rx="22" ry="7" fill="#c94f3e"/>
+    <circle cx="-30" cy="-4" r="4" fill="#3d2c1e"/><circle cx="30" cy="-4" r="4" fill="#3d2c1e"/>
+  </g>`; }
+function bookStall(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-30" y="-6" width="60" height="10" fill="#7a5230"/>
+    ${[-22,-8,6,20].map((cx,i)=>`<rect x="${cx}" y="-${16+((i%2)*4)}" width="12" height="${12+((i%2)*4)}" fill="${['#c94f3e','#3f6a8f','#5c9a5c','#d9a441'][i]}"/>`).join('')}
+  </g>`; }
+function desk(x,y,scale,color){ scale=scale||1; color=color||"#7a5230"; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-36" y="-6" width="72" height="8" fill="${color}"/>
+    <rect x="-32" y="2" width="6" height="16" fill="${color}"/><rect x="26" y="2" width="6" height="16" fill="${color}"/>
+    <rect x="-24" y="-22" width="26" height="18" fill="#cfe4f2"/>
+  </g>`; }
+function riverWave(y){ let s=""; for(let i=0;i<8;i++){ s+=`<path d="M${i*55-20},${y} q14,-8 28,0 t28,0" stroke="#bcd9e6" stroke-width="4" fill="none"/>`; } return s; }
+function bench(x,y,scale){ scale=scale||1; return `<g transform="translate(${x},${y}) scale(${scale})">
+    <rect x="-24" y="-4" width="48" height="5" fill="#7a5230"/><rect x="-24" y="-18" width="48" height="5" fill="#7a5230"/>
+    <rect x="-20" y="0" width="4" height="10" fill="#3d2c1e"/><rect x="16" y="0" width="4" height="10" fill="#3d2c1e"/>
+  </g>`; }
+
+/* ===== character avatar (headshot) for cast strip ===== */
+const CHARACTERS = {
+  david:{label:"David",shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"},
+  claire:{label:"Claire",shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"},
+  jack:{label:"Jack",shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"},
+  emma:{label:"Emma",shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"},
+  max:{label:"Max (the dog)",dog:true},
+  peter:{label:"Peter",shirt:"#6b7280",hair:"#3d3324",hairStyle:"short"},
+  sarah:{label:"Sarah",shirt:"#2f8f8f",hair:"#2e2018",hairStyle:"long"},
+  hartley:{label:"Mr. Hartley",shirt:"#5a4636",hair:"#8a7f6d",hairStyle:"short"},
+};
+function avatarSVG(key){
+  const c = CHARACTERS[key];
+  if(!c) return "";
+  if(c.dog){
+    return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#fef6e4"/><g transform="translate(40,58)">${dog(0,0,2.2,"#b5793a")}</g></svg>`;
+  }
+  return `<svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#fef6e4"/><g transform="translate(40,66)">${person(0,0,1.7,{shirt:c.shirt,hair:c.hair,hairStyle:c.hairStyle})}</g></svg>`;
+}
+function castStrip(castArr){
+  return `<div class="cast-strip">` + castArr.map(k=>`<div class="cast-chip">${avatarSVG(k)}<span>${CHARACTERS[k].label}</span></div>`).join('') + `</div>`;
+}
+
+/* ===== full chapter illustrations (400x200 viewBox) ===== */
+const ILLUSTRATIONS = {
+1: ()=>`<svg viewBox="0 0 400 200">${sky("#bfe3f2","#eaf6ee")}${ground(150,"#a9cf8f")}${cloud(60,35)}${cloud(300,25)}
+  ${tree(340,150,1.1)}${tree(30,155,0.9)}${flower(280,175,"#e8748a")}${flower(300,178,"#f4c65e")}
+  ${house(180,180,1.15,"#e8d9b8","#a8562c")}
+  ${person(90,190,1,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(120,192,0.95,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(255,190,0.8,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(280,192,0.72,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${dog(215,196,0.9,"#b5793a")}`,
+2: ()=>`<svg viewBox="0 0 400 200">${sky("#fce9c6","#fff6e2")}${ground(160,"#e8d9b8")}
+  <rect x="20" y="40" width="360" height="120" fill="#fff9ee" stroke="#e4dbc8" stroke-width="2"/>
+  <rect x="40" y="70" width="120" height="70" fill="#d8c9a3"/>
+  ${sun(345,35)}
+  ${person(210,180,1,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(255,182,0.95,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(300,178,0.8,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  <circle cx="90" cy="95" r="14" fill="#f6cf5e"/><circle cx="120" cy="100" r="10" fill="#eee3c8"/>
+  <rect x="60" y="115" width="70" height="6" fill="#c94f3e"/>`,
+3: ()=>`<svg viewBox="0 0 400 200">${sky("#cfe3f7","#f2f7ee")}${ground(165,"#e8dcc4")}
+  <rect x="10" y="20" width="380" height="145" fill="#fff9ee" stroke="#e4dbc8" stroke-width="2"/>
+  <rect x="30" y="35" width="150" height="70" fill="#f3ead9" stroke="#8a7f6d" stroke-width="3"/>
+  <text x="105" y="80" font-size="26" text-anchor="middle" fill="#a8562c" font-family="Georgia">ABC</text>
+  ${person(240,165,0.8,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${person(280,167,0.75,{shirt:"#e8748a",hair:"#3d2c1e",hairStyle:"long"})}
+  ${desk(320,190,0.9)}${desk(230,192,0.9)}`,
+4: ()=>`<svg viewBox="0 0 400 200">${sky("#bfe3f2","#eaf6ee")}${ground(140,"#a9cf8f")}
+  ${sun(40,35)}${cloud(230,30)}
+  ${tree(60,175,1.1)}${flower(140,180,"#e8748a")}${flower(160,178,"#f4c65e")}${flower(180,182,"#8b5fbf")}
+  ${person(120,195,1,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(255,190,0.9,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(280,192,0.7,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${dog(190,198,0.85,"#b5793a")}
+  <ellipse cx="300" cy="150" rx="60" ry="18" fill="#f0e2bd"/>`,
+5: ()=>`<svg viewBox="0 0 400 200">${sky("#bfe3f2","#eaf6ee")}${ground(150,"#a9cf8f")}
+  ${riverWave(178)}${tree(40,150,1)}${tree(360,155,0.9)}
+  ${person(150,190,0.85,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${person(230,188,1,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${dog(280,192,0.95,"#b5793a")}
+  <path d="M110,165 q10,-14 25,-4" stroke="#5a4636" stroke-width="2" fill="none" stroke-dasharray="3,3"/>`,
+6: ()=>`<svg viewBox="0 0 400 200">${sky("#dbe7f0","#f4f6f2")}${ground(175,"#c9c2ae")}
+  ${office(120,180,1,"#7a92a8")}${office(260,180,0.85,"#8fa6b8")}
+  ${busShape(70,185,0.6)}
+  ${person(200,190,0.85,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}`,
+7: ()=>`<svg viewBox="0 0 400 200">${sky("#dbe7f0","#f4f6f2")}${ground(170,"#e8e2d0")}
+  <rect x="10" y="20" width="380" height="150" fill="#fff9ee" stroke="#e4dbc8" stroke-width="2"/>
+  ${desk(100,150,0.9)}${desk(220,150,0.9)}${desk(320,150,0.8)}
+  ${person(110,178,0.85,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(200,180,0.85,{shirt:"#2f8f8f",hair:"#2e2018",hairStyle:"long"})}
+  ${person(300,178,0.8,{shirt:"#6b7280",hair:"#3d3324",hairStyle:"short"})}`,
+8: ()=>`<svg viewBox="0 0 400 200">${sky("#e6d7c3","#f4f6f2")}${ground(170,"#e8e2d0")}
+  <rect x="10" y="20" width="380" height="150" fill="#fff9ee" stroke="#e4dbc8" stroke-width="2"/>
+  ${clockTower(340,175,0.55)}
+  ${desk(150,155,1)}
+  ${person(120,182,0.85,{shirt:"#6b7280",hair:"#3d3324",hairStyle:"short"})}
+  ${person(200,182,0.85,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  <rect x="130" y="120" width="40" height="26" fill="#fff" stroke="#c94f3e" stroke-width="2"/>`,
+9: ()=>`<svg viewBox="0 0 400 200">${sky("#f7e9c9","#fdf6e8")}${ground(175,"#e8e2d0")}
+  ${desk(200,165,1.3,"#5a4636")}
+  ${person(150,190,0.9,{shirt:"#5a4636",hair:"#8a7f6d",hairStyle:"short"})}
+  ${person(260,190,0.9,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  <text x="200" y="40" font-size="22" text-anchor="middle" fill="#d9a441">✦ Great news! ✦</text>`,
+10: ()=>`<svg viewBox="0 0 400 200">${sky("#dff1e3","#fdf6e8")}${ground(175,"#e8dcc4")}
+  <rect x="90" y="130" width="220" height="10" fill="#7a5230"/>
+  <rect x="100" y="90" width="200" height="40" fill="#fdf6e8" stroke="#a8562c" stroke-width="2"/>
+  <path d="M120,110 q80,-30 160,0" stroke="#3f6a8f" stroke-width="2" fill="none"/>
+  ${person(130,190,0.9,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(180,192,0.85,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(240,190,0.75,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(270,192,0.65,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${dog(300,196,0.8,"#b5793a")}`,
+11: ()=>`<svg viewBox="0 0 400 200">${sky("#dff1e3","#fdf6e8")}${ground(175,"#e8dcc4")}
+  ${desk(200,175,1.4,"#7a5230")}
+  <rect x="150" y="130" width="100" height="24" fill="#fff" stroke="#3f6a8f" stroke-width="2"/>
+  ${suitcase(90,190,1,"#a8562c")}${suitcase(310,190,0.85,"#3f8f7f")}
+  ${person(160,192,0.85,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(240,192,0.8,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}`,
+12: ()=>`<svg viewBox="0 0 400 200">${sky("#cfe3f7","#eef3ee")}${ground(180,"#c9c2ae")}
+  ${trainShape(140,175,1,"#3f6a8f")}${clockTower(350,180,0.5)}
+  ${person(230,192,0.8,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(255,192,0.75,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(280,192,0.65,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(300,192,0.55,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${suitcase(215,196,0.7,"#a8562c")}`,
+13: ()=>`<svg viewBox="0 0 400 200">${sky("#cfe3f7","#eef3ee")}${ground(160,"#d8cba8")}
+  ${museumFacade(200,160,1)}${statueShape(130,178,1)}
+  ${person(240,192,0.8,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${person(270,192,0.85,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(300,192,0.55,{shirt:"#6b7280",hair:"#3d3324",hairStyle:"short"})}`,
+14: ()=>`<svg viewBox="0 0 400 200">${sky("#e6d7c3","#f4ede0")}${ground(175,"#c9c2ae")}
+  ${clockTower(90,180,0.6)}${cafeTable(260,190,0.9)}
+  ${person(200,192,0.8,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(230,192,0.75,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${bookStall(320,196,0.7)}`,
+15: ()=>`<svg viewBox="0 0 400 200">${sky("#2d3550","#5a4b6b")}${starField()}${moon(340,35)}${ground(160,"#3f3a4a")}
+  ${house(180,190,1.1,"#e8d9b8","#a8562c")}
+  ${person(90,200,1,{shirt:"#2c4a6e",hair:"#4a3324",hairStyle:"short"})}
+  ${person(120,202,0.95,{shirt:"#c9564f",hair:"#5a3b28",hairStyle:"long"})}
+  ${person(255,200,0.8,{shirt:"#4a8f5c",hair:"#2e2018",hairStyle:"short"})}
+  ${person(280,202,0.72,{shirt:"#8b5fbf",hair:"#5a3b28",hairStyle:"pigtails"})}
+  ${dog(215,206,1,"#b5793a")}
+  <text x="200" y="30" font-size="16" text-anchor="middle" fill="#f6cf5e">✦ Welcome home ✦</text>`,
+};
+
+/* ================= STORY DATA ================= */
+const SERIES = [
+  { id:1, title:"Series 1 — The Turner Family", theme:"Family & Daily Life", color:"var(--s1)" },
+  { id:2, title:"Series 2 — Life in the City", theme:"Work & City Life", color:"var(--s2)" },
+  { id:3, title:"Series 3 — The Big Journey", theme:"Travel & Culture", color:"var(--s3)" },
+];
+
+const CHAPTERS = [
+{
+  id:1, series:1, title:"The Turner Family", emoji:"🏠", cast:["david","claire","jack","emma","max"],
+  text:[
+    "This is the Turner family. <g w='live'>They live</g> in a small house near the <g w='park'>park</g>. There are four people in the family: David, Claire, Jack, and Emma.",
+    "David Turner is the father. He is forty years old. Claire Turner is the mother. She is thirty-eight years old. Jack is their son. He is seventeen. Emma is their daughter. She is fourteen.",
+    "The house has a small <g w='garden'>garden</g> behind it. In the garden, there is a big tree and some flowers. The family also has a dog. His name is Max.",
+    "David works in an office in the city. Claire works at a school near their house. Jack and Emma <g w='attend'>attend</g> the same school as their mother, but they are in different classes.",
+  ],
+  spotlight:{quote:"They <b>live</b> in a small house. David <b>works</b> in an office. Claire <b>works</b> at a school.",
+    hint:"All three verbs end in the base form or with -s. Can you see why 'live' has no -s, but 'works' does? Think about 'they' and 'David'."},
+  glossary:[
+    {term:"live", def:"to have your home in a place"},
+    {term:"park", def:"a big green area in a town where people walk and play"},
+    {term:"garden", def:"a piece of land next to a house, with grass, flowers, or trees"},
+    {term:"attend", def:"to go to a place regularly, like a school"},
+  ],
+  vocab:[["family","🧑‍🧑‍🧒‍🧒","a group of people related to each other, like parents and children"],
+    ["house","🏠","a building where a family lives"],
+    ["garden","🌳","a piece of land with flowers and trees, next to a house"],
+    ["live","🏡","to have your home in a place"],
+    ["near","📍","not far from"],
+    ["park","🌳","a green public area for walking and playing"],
+    ["dog","🐕","a common house animal that barks"],
+    ["office","🏢","a room or building where people do business work"],
+    ["school","🏫","a place where children go to learn"],
+    ["different","🔀","not the same"]],
+  exerciseA:{
+    text:"The Turner family <b1> in a small house near the park. David is the <b2>. Claire is the <b3>. Jack and Emma are the <b4>. There is a big tree in the <b5>.",
+    blanks:[
+      {answer:"live", options:["live","house","dog"]},
+      {answer:"father", options:["father","daughter","dog"]},
+      {answer:"mother", options:["mother","son","garden"]},
+      {answer:"children", options:["children","parents","office"]},
+      {answer:"garden", options:["garden","office","school"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"How many people are there in the Turner family?", model:"There are four people in the Turner family."},
+      {q:"Where does David work?", model:"David works in an office in the city."},
+      {q:"What is in the garden?", model:"There is a big tree and some flowers in the garden."},
+    ]
+  },
+  exerciseC:{
+    title:"Asking 'How many' and 'Where'",
+    items:[
+      {prompt:"___ people are there in the family?", options:["How many","Where","What"], correct:0},
+      {prompt:"___ does Claire work?", options:["How many","Where","Who"], correct:1},
+      {prompt:"___ is the father of the family?", options:["Where","What","Who"], correct:2},
+    ]
+  }
+},
+{
+  id:2, series:1, title:"A Morning at the Turners' House", emoji:"🍳", cast:["david","claire","jack","emma"],
+  text:[
+    "Every morning, the Turner family <g w='wake up'>wakes up</g> at half past six. David gets up first and makes coffee for himself and Claire.",
+    "Jack and Emma get up a little later, at seven o'clock. They eat breakfast together in the kitchen: toast, eggs, and orange juice.",
+    "After breakfast, David <g w='leave'>leaves</g> the house at eight o'clock to go to work. He takes the bus to the city. Claire, Jack, and Emma leave a little later because the school is closer to their house.",
+    "Max, the dog, stays at home all day. He sleeps in the garden when the weather is warm, and Claire walks him every evening after dinner.",
+  ],
+  spotlight:{quote:"David <b>gets up</b> first. Jack and Emma <b>get up</b> a little later.",
+    hint:"'Get up' means 'to leave your bed'. Notice how it changes with 'David' (he) but not with 'Jack and Emma' (they)."},
+  glossary:[
+    {term:"wake up", def:"to stop sleeping"},
+    {term:"leave", def:"to go away from a place"},
+  ],
+  vocab:[["morning","⏰","the early part of the day"],
+    ["wake up","😴","to stop sleeping"],
+    ["breakfast","🍳","the first meal of the day"],
+    ["toast","🍞","bread that has been heated until brown"],
+    ["leave","🚪","to go away from a place"],
+    ["bus","🚌","a large vehicle that carries many passengers"],
+    ["closer","📏","nearer, at a shorter distance"],
+    ["warm","☀️","a comfortable, not-cold temperature"],
+    ["evening","🌙","the part of the day before night"],
+    ["dinner","🍽️","the main meal, usually in the evening"]],
+  exerciseA:{
+    text:"The Turner family <b1> up at half past six. They eat <b2> together in the kitchen. David takes the <b3> to work. Max sleeps in the garden when it is <b4>. Claire walks Max every <b5>.",
+    blanks:[
+      {answer:"wakes", options:["wakes","leaves","eats"]},
+      {answer:"breakfast", options:["breakfast","dinner","coffee"]},
+      {answer:"bus", options:["bus","car","dog"]},
+      {answer:"warm", options:["warm","closer","later"]},
+      {answer:"evening", options:["evening","morning","garden"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What time does the family wake up?", model:"The family wakes up at half past six."},
+      {q:"What do Jack and Emma eat for breakfast?", model:"They eat toast, eggs, and orange juice."},
+      {q:"Who walks Max every evening?", model:"Claire walks Max every evening after dinner."},
+    ]
+  },
+  exerciseC:{
+    title:"Asking 'What time' and 'Who'",
+    items:[
+      {prompt:"___ does David leave the house?", options:["What time","Who","Why"], correct:0},
+      {prompt:"___ walks Max every evening?", options:["What time","Who","Where"], correct:1},
+      {prompt:"___ do they eat for breakfast?", options:["Who","When","What"], correct:2},
+    ]
+  }
+},
+{
+  id:3, series:1, title:"Emma's School Day", emoji:"🎨", cast:["emma"],
+  text:[
+    "Emma is fourteen years old. Her favorite subject at school is art, because she loves to draw and paint. Her <g w='least favorite'>least favorite</g> subject is math, because she finds the numbers difficult.",
+    "Emma has a best friend named Lucy. They sit next to each other in most classes. At lunchtime, they always eat together and talk about their day.",
+    "This week, Emma's class has a new project. They must make a small book about an animal. Emma chooses to make her book about dogs, because she loves Max very much.",
+    "After school, Emma does her homework at the kitchen table. Sometimes it is easy, and sometimes it is difficult. When it is difficult, her brother Jack helps her.",
+  ],
+  spotlight:{quote:"Her favorite subject <b>is</b> art. Her least favorite subject <b>is</b> math.",
+    hint:"The pattern 'X is Y, because...' is a simple, powerful way to explain a preference. Try to say your own favorite subject using this pattern."},
+  glossary:[
+    {term:"least favorite", def:"the one you like the least, opposite of favorite"},
+  ],
+  vocab:[["subject","📘","a topic studied at school, like math or art"],
+    ["favorite","⭐","the one you like most"],
+    ["difficult","🧩","not easy, hard to do"],
+    ["easy","✅","simple, not hard to do"],
+    ["friend","👧","a person you like and know well"],
+    ["project","🗂️","a piece of school work, often over several days"],
+    ["homework","📚","school work done at home"],
+    ["choose","👉","to decide which one you want"],
+    ["lunchtime","🍱","the time in the middle of the day for eating"],
+    ["help","🤝","to make something easier for someone"]],
+  exerciseA:{
+    text:"Emma's <b1> subject is art. Her least favorite subject is <b2>, because the numbers are <b3>. Her best <b4> is Lucy. Emma's class has a new <b5> about animals.",
+    blanks:[
+      {answer:"favorite", options:["favorite","difficult","easy"]},
+      {answer:"math", options:["math","art","dogs"]},
+      {answer:"difficult", options:["difficult","easy","warm"]},
+      {answer:"friend", options:["friend","brother","dog"]},
+      {answer:"project", options:["project","homework","book"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Why does Emma love art?", model:"She loves art because she loves to draw and paint."},
+      {q:"Who is Emma's best friend?", model:"Emma's best friend is Lucy."},
+      {q:"Who helps Emma with difficult homework?", model:"Her brother Jack helps her."},
+    ]
+  },
+  exerciseC:{
+    title:"Asking 'Why'",
+    items:[
+      {prompt:"___ is math difficult for Emma?", options:["Why","Who","Where"], correct:0},
+      {prompt:"___ does Jack help Emma?", options:["What","Why","How many"], correct:1},
+      {prompt:"'Because' is used to answer the question ___.", options:["Where?","Why?","Who?"], correct:1},
+    ]
+  }
+},
+{
+  id:4, series:1, title:"A Weekend at Home", emoji:"🌻", cast:["david","claire","jack","emma","max"],
+  text:[
+    "On Saturday morning, the Turner family does not go to work or school. They like to <g w='relax'>relax</g> and spend time together.",
+    "David likes to work in the garden on Saturdays. He cuts the grass and waters the flowers. Jack often helps his father, because he wants to learn about gardening.",
+    "Claire and Emma usually go to the market in the morning. They buy fruit, vegetables, and bread for the week. Sometimes they also buy a small gift for someone in the family.",
+    "In the afternoon, the family often watches a film together, or plays a board game. Max always wants to play too, so he brings his ball and drops it at their feet.",
+  ],
+  spotlight:{quote:"Claire and Emma <b>usually</b> go to the market. Max <b>always</b> wants to play.",
+    hint:"'Usually' and 'always' both describe how often something happens, but one is stronger than the other. Which word means '100% of the time'?"},
+  glossary:[
+    {term:"relax", def:"to rest and not work, to feel calm"},
+  ],
+  vocab:[["weekend","🗓️","Saturday and Sunday"],
+    ["relax","🛋️","to rest and feel calm"],
+    ["garden work","🌱","tasks like cutting grass or planting flowers"],
+    ["water","💧","to give water to plants"],
+    ["market","🛒","a place where people buy fruit, vegetables, and other goods"],
+    ["fruit","🍎","food like apples and oranges that grows on trees or plants"],
+    ["vegetables","🥕","food like carrots or potatoes"],
+    ["afternoon","🌤️","the part of the day between midday and evening"],
+    ["film","🎬","a movie"],
+    ["game","🎲","an activity played for fun, often with rules"]],
+  exerciseA:{
+    text:"On Saturday, the family likes to <b1> together. David works in the <b2> and waters the flowers. Claire and Emma go to the <b3> to buy fruit and vegetables. In the <b4>, they often watch a <b5>.",
+    blanks:[
+      {answer:"relax", options:["relax","work","study"]},
+      {answer:"garden", options:["garden","market","office"]},
+      {answer:"market", options:["market","school","garden"]},
+      {answer:"afternoon", options:["afternoon","morning","evening"]},
+      {answer:"film", options:["film","dog","book"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What does David do in the garden?", model:"He cuts the grass and waters the flowers."},
+      {q:"Where do Claire and Emma go on Saturday morning?", model:"They go to the market."},
+      {q:"What does Max bring when the family plays a game?", model:"Max brings his ball."},
+    ]
+  },
+  exerciseC:{
+    title:"Talking about habits with 'usually', 'often', 'always'",
+    items:[
+      {prompt:"Claire and Emma ___ go to the market on Saturday. (this happens almost every week)", options:["usually","never","yesterday"], correct:0},
+      {prompt:"Max ___ wants to play. (this is true every time)", options:["always","rarely","once"], correct:0},
+      {prompt:"Which word means 'from time to time, not every time'?", options:["always","sometimes","never"], correct:1},
+    ]
+  }
+},
+{
+  id:5, series:1, title:"Max Runs Away", emoji:"🐾", cast:["david","claire","jack","emma","max"],
+  text:[
+    "One Saturday afternoon, something surprising <g w='happened'>happened</g>. Max saw a cat in the garden and ran after it. He ran through a hole in the fence and disappeared into the street.",
+    "Emma was the first person to notice that Max was gone. She called his name, but he did not come back. She ran into the house and told her family.",
+    "The whole family went out to <g w='look for'>look for</g> Max. David walked toward the park, Claire and Jack walked toward the market, and Emma stayed near the house and called Max's name again and again.",
+    "After twenty minutes, Jack found Max near the river. The dog was tired but happy. Jack picked him up and carried him home. Everyone was relieved, and Emma hugged Max for a long time.",
+  ],
+  spotlight:{quote:"Max <b>ran</b> after it. Jack <b>found</b> Max near the river.",
+    hint:"'Ran' and 'found' both talk about the past, but they don't end in -ed like 'called' or 'walked'. These are special past forms you simply have to remember."},
+  glossary:[
+    {term:"happened", def:"took place, occurred"},
+    {term:"look for", def:"to try to find something or someone"},
+  ],
+  vocab:[["run away","🏃","to leave a place suddenly, without permission"],
+    ["hole","🕳️","an empty space or opening in something"],
+    ["disappear","💨","to go somewhere and no longer be seen"],
+    ["notice","👀","to see or realize something"],
+    ["look for","🔍","to try to find something"],
+    ["toward","➡️","in the direction of"],
+    ["find","✨","to discover something after searching"],
+    ["tired","😪","needing rest, having little energy"],
+    ["relieved","😌","feeling relaxed because a worry has stopped"],
+    ["hug","🤗","to put your arms around someone warmly"]],
+  exerciseA:{
+    text:"Max saw a cat and <b1> after it through a hole in the fence. Emma was the first to <b2> that Max was gone. The family went out to <b3> him. Jack <b4> Max near the river. Everyone was <b5> when Max came home.",
+    blanks:[
+      {answer:"ran", options:["ran","walked","slept"]},
+      {answer:"notice", options:["notice","forget","cook"]},
+      {answer:"look for", options:["look for","play with","cook for"]},
+      {answer:"found", options:["found","lost","sold"]},
+      {answer:"relieved", options:["relieved","angry","tired"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Why did Max run away?", model:"Max ran away because he saw a cat and ran after it."},
+      {q:"Who found Max?", model:"Jack found Max."},
+      {q:"Where did Jack find Max?", model:"Jack found Max near the river."},
+    ]
+  },
+  exerciseC:{
+    title:"Simple Past Tense — regular and irregular verbs",
+    items:[
+      {prompt:"Yesterday, Max ___ (run) away.", options:["run","ran","runned"], correct:1},
+      {prompt:"Jack ___ (find) Max near the river.", options:["find","finded","found"], correct:2},
+      {prompt:"The family ___ (call) his name.", options:["called","call","calling"], correct:0},
+    ]
+  },
+  grammarNote:{
+    title:"The Simple Past Tense",
+    text:"When something happened before now, we use the simple past tense. Many verbs simply add -ed: 'call → called', 'walk → walked'. But some common verbs are irregular and change completely: 'run → ran', 'find → found', 'see → saw'. You cannot guess these — you must learn them one by one, the way you have learned 'run → ran' and 'find → found' in this chapter."
+  }
+},
+{
+  id:6, series:2, title:"David's Job", emoji:"💼", cast:["david","peter","hartley"],
+  text:[
+    "David Turner works for a company called Hartley & Sons. The company sells office furniture — desks, chairs, and shelves — to businesses all over the country.",
+    "David is not the boss of the company. His boss is Mr. Hartley. David works with about ten other people in a large room full of desks and computers.",
+    "Every day, David answers phone calls from customers, writes emails, and attends meetings. He has worked at Hartley & Sons for five years, and he knows his job very well.",
+    "David's closest <g w='colleague'>colleague</g> is a man named Peter. They sit next to each other and often help each other when the work is difficult.",
+  ],
+  spotlight:{quote:"David <b>has worked</b> at Hartley & Sons for five years.",
+    hint:"This is a new pattern: 'has' + a past-style verb, used for something that started in the past and is still true now. Compare it to the simple past you saw in Chapter 5."},
+  glossary:[
+    {term:"colleague", def:"a person you work with"},
+  ],
+  vocab:[["company","🏢","a business that sells goods or services"],
+    ["boss","👔","the person in charge at work"],
+    ["furniture","🪑","things like desks, chairs, and tables"],
+    ["customer","🛍️","a person who buys something"],
+    ["email","📧","a message sent by computer"],
+    ["meeting","🗣️","when people gather to discuss something"],
+    ["colleague","🤝","a person you work with"],
+    ["answer","☎️","to reply to a call or question"],
+    ["attend","📅","to be present at an event"],
+    ["desk","🖥️","a table used for working, often with a computer"]],
+  exerciseA:{
+    text:"David works for a <b1> that sells office furniture. His <b2> is Mr. Hartley. Every day, David answers phone calls and attends <b3>. His closest <b4> is Peter. They often <b5> each other.",
+    blanks:[
+      {answer:"company", options:["company","school","garden"]},
+      {answer:"boss", options:["boss","colleague","customer"]},
+      {answer:"meetings", options:["meetings","dinners","gardens"]},
+      {answer:"colleague", options:["colleague","boss","customer"]},
+      {answer:"help", options:["help","forget","sell"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What does Hartley & Sons sell?", model:"The company sells office furniture."},
+      {q:"How long has David worked there?", model:"David has worked there for five years."},
+      {q:"Who is David's closest colleague?", model:"David's closest colleague is Peter."},
+    ]
+  },
+  exerciseC:{
+    title:"Introducing the Present Perfect: 'has worked for...'",
+    items:[
+      {prompt:"David ___ worked at Hartley & Sons for five years.", options:["has","have","is"], correct:0},
+      {prompt:"'For five years' tells us ___.", options:["a point in time (yesterday)","a length of time (a period)","a place"], correct:1},
+      {prompt:"Which sentence uses the present perfect correctly?", options:["I work here since 2020.","I have worked here since 2020.","I worked here since 2020."], correct:1},
+    ]
+  }
+},
+{
+  id:7, series:2, title:"A New Colleague", emoji:"👋", cast:["david","sarah","peter","hartley"],
+  text:[
+    "On Monday morning, Mr. Hartley introduced a new colleague to the office. Her name is Sarah, and this is her first job after finishing university.",
+    "David offered to show Sarah around the office. He introduced her to Peter and the other colleagues, and explained where everything was — the kitchen, the meeting room, and the printer.",
+    "Sarah's <g w='task'>task</g> for her first week is to learn about the company's products and customers. She has a lot of questions, and David is happy to answer them.",
+    "By Friday, Sarah already feels more comfortable. She has learned the names of her colleagues, and she has started to understand how the company works.",
+  ],
+  spotlight:{quote:"By Friday, Sarah <b>already</b> feels more comfortable. She <b>has learned</b> the names of her colleagues.",
+    hint:"'Already' often appears with the present perfect ('has learned') to show something happened sooner than expected. Notice the two go together naturally."},
+  glossary:[
+    {term:"task", def:"a piece of work that someone must do"},
+  ],
+  vocab:[["introduce","👋","to make one person known to another"],
+    ["university","🎓","a place for higher education after school"],
+    ["offer","🙋","to say you are willing to do something"],
+    ["explain","💬","to make something clear"],
+    ["printer","🖨️","a machine that prints documents"],
+    ["task","📋","a piece of work to be done"],
+    ["product","📦","something a company makes or sells"],
+    ["comfortable","😊","feeling relaxed and at ease"],
+    ["already","⏱️","before now, sooner than expected"],
+    ["understand","💡","to know the meaning of something"]],
+  exerciseA:{
+    text:"Mr. Hartley <b1> Sarah to the office on Monday. David offered to show her <b2> and <b3> where everything was. Sarah's task is to learn about the company's <b4>. By Friday, she feels more <b5>.",
+    blanks:[
+      {answer:"introduced", options:["introduced","forgot","sold"]},
+      {answer:"around", options:["around","away","for"]},
+      {answer:"explained", options:["explained","hid","carried"]},
+      {answer:"products", options:["products","gardens","dogs"]},
+      {answer:"comfortable", options:["comfortable","tired","lost"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Who is Sarah?", model:"Sarah is a new colleague at Hartley & Sons."},
+      {q:"What is Sarah's task for her first week?", model:"Her task is to learn about the company's products and customers."},
+      {q:"How does Sarah feel by Friday?", model:"By Friday, she feels more comfortable."},
+    ]
+  },
+  exerciseC:{
+    title:"Using 'already' and 'by' with time",
+    items:[
+      {prompt:"By Friday, she ___ learned the names of her colleagues.", options:["already has","has already","already have"], correct:1},
+      {prompt:"'By Friday' means ___.", options:["exactly on Friday","not later than Friday","after Friday"], correct:1},
+      {prompt:"We use 'already' to show that something ___.", options:["will happen soon","happened sooner than expected","never happened"], correct:1},
+    ]
+  }
+},
+{
+  id:8, series:2, title:"A Problem at the Office", emoji:"⏳", cast:["david","peter","hartley"],
+  text:[
+    "One afternoon, Peter found a serious <g w='mistake'>mistake</g> in an important report. The report was for a big customer, and it needed to be sent that same day.",
+    "Peter was very stressed. He did not know how to fix the mistake before the <g w='deadline'>deadline</g>. He asked David for help.",
+    "David and Peter worked together as a team. David checked the numbers again, while Peter rewrote the report. They worked quickly, but carefully.",
+    "By five o'clock, they had finished the report and sent it to the customer. Mr. Hartley thanked them both for solving the problem so quickly.",
+  ],
+  spotlight:{quote:"By five o'clock, they <b>had finished</b> the report.",
+    hint:"This is different again from 'has worked' in Chapter 6 — here it's 'had finished'. It shows the finishing happened before another moment (five o'clock) in the past."},
+  glossary:[
+    {term:"mistake", def:"something that is wrong or done incorrectly"},
+    {term:"deadline", def:"the time by which something must be finished"},
+  ],
+  vocab:[["mistake","❌","something wrong or incorrect"],
+    ["report","📄","a written document describing facts"],
+    ["stressed","😰","feeling worried and under pressure"],
+    ["deadline","⏳","the time by which something must be done"],
+    ["fix","🔧","to repair or correct something"],
+    ["team","🤝","a group of people working together"],
+    ["check","✔️","to look at something to make sure it's correct"],
+    ["rewrite","✍️","to write something again, differently"],
+    ["solve","🧩","to find the answer to a problem"],
+    ["thank","🙏","to express gratitude"]],
+  exerciseA:{
+    text:"Peter found a serious <b1> in an important report. He was very <b2> and asked David for help. They worked together as a <b3>. By five o'clock, they had <b4> the report. Mr. Hartley thanked them for <b5> the problem.",
+    blanks:[
+      {answer:"mistake", options:["mistake","meeting","customer"]},
+      {answer:"stressed", options:["stressed","relaxed","comfortable"]},
+      {answer:"team", options:["team","customer","company"]},
+      {answer:"finished", options:["finished","started","lost"]},
+      {answer:"solving", options:["solving","forgetting","selling"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What did Peter find in the report?", model:"Peter found a serious mistake in the report."},
+      {q:"Who did Peter ask for help?", model:"Peter asked David for help."},
+      {q:"Did they finish the report before five o'clock?", model:"Yes, they finished it by five o'clock."},
+    ]
+  },
+  exerciseC:{
+    title:"Past Perfect: 'had finished' — something completed before another past moment",
+    items:[
+      {prompt:"By five o'clock, they ___ finished the report.", options:["have","had","has"], correct:1},
+      {prompt:"We use the past perfect to talk about something that happened ___ another past event.", options:["after","before","during"], correct:1},
+      {prompt:"Which is correct? 'When Mr. Hartley arrived, they ___ the report.'", options:["already sent","had already sent","have already sent"], correct:1},
+    ]
+  },
+  grammarNote:{
+    title:"Past Simple vs. Past Perfect",
+    text:"We use the simple past ('they finished') for a single past action. We use the past perfect ('they had finished') when we talk about a past action that happened before another past action. In this chapter: 'By five o'clock, they had finished the report' shows that finishing happened before five o'clock — an earlier point in the past."
+  }
+},
+{
+  id:9, series:2, title:"Good News", emoji:"📈", cast:["david","claire","hartley"],
+  text:[
+    "A few weeks later, Mr. Hartley called David into his office. David was a little nervous, because he did not know why his boss wanted to speak to him.",
+    "Mr. Hartley told David that he was very pleased with his work, especially with how David had helped Peter with the report. He said the company needed a new manager for David's team.",
+    "Mr. Hartley offered David the job. It was a <g w='promotion'>promotion</g>: more responsibility, and more money too. David could not believe his good luck.",
+    "That evening, David told Claire the news. She was so proud of him that she almost cried. They decided to celebrate with a special dinner for the whole family.",
+  ],
+  spotlight:{quote:"Mr. Hartley was pleased, especially with how David <b>had helped</b> Peter.",
+    hint:"Look back at Chapter 8's 'had finished'. Here, 'had helped' works the same way: the helping happened before Mr. Hartley's decision to promote David."},
+  glossary:[
+    {term:"promotion", def:"a move to a better, higher job in a company"},
+  ],
+  vocab:[["nervous","😬","worried or anxious about something"],
+    ["pleased","😊","happy and satisfied"],
+    ["especially","✨","more than usual, particularly"],
+    ["manager","🧑‍💼","a person who leads a team at work"],
+    ["promotion","📈","a move to a higher, better job"],
+    ["responsibility","🎯","a duty that you must take care of"],
+    ["believe","🤔","to accept something as true"],
+    ["luck","🍀","good things that happen by chance"],
+    ["proud","🥰","feeling pleased about someone's achievement"],
+    ["celebrate","🎉","to do something enjoyable for a special reason"]],
+  exerciseA:{
+    text:"Mr. Hartley was very <b1> with David's work. He offered David a <b2>: more <b3> and more money. David could not <b4> his good luck. Claire was very <b5> of him.",
+    blanks:[
+      {answer:"pleased", options:["pleased","nervous","tired"]},
+      {answer:"promotion", options:["promotion","dinner","mistake"]},
+      {answer:"responsibility", options:["responsibility","furniture","garden"]},
+      {answer:"believe", options:["believe","forget","sell"]},
+      {answer:"proud", options:["proud","angry","stressed"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Why was Mr. Hartley pleased with David?", model:"He was pleased because David had helped Peter with the report."},
+      {q:"What did Mr. Hartley offer David?", model:"He offered David a promotion."},
+      {q:"How did the family celebrate?", model:"They celebrated with a special dinner."},
+    ]
+  },
+  exerciseC:{
+    title:"Present Perfect for recent achievements: 'had helped'",
+    items:[
+      {prompt:"Mr. Hartley was pleased because David ___ Peter with the report.", options:["helps","had helped","helping"], correct:1},
+      {prompt:"'Especially' is used to ___.", options:["give an example that stands out","end a sentence","ask a question"], correct:0},
+      {prompt:"A 'promotion' means your job becomes ___.", options:["easier and smaller","higher, with more responsibility","the same as before"], correct:1},
+    ]
+  }
+},
+{
+  id:10, series:2, title:"Talking About the Future", emoji:"🗺️", cast:["david","claire","jack","emma","max"],
+  text:[
+    "After David's promotion, the Turner family started to talk about their future. With more money, they could finally think about things they had always wanted to do.",
+    "\"We are going to save some money every month,\" said Claire, \"and next year, we will take a big trip somewhere new.\"",
+    "Jack was excited. \"Where will we go?\" he asked. \"I have always wanted to see London,\" said Emma, \"and visit a real museum, not just pictures in a book.\"",
+    "David smiled. \"Then that is what we will do. Next summer, the Turner family is going to visit London.\" Everyone cheered, even Max, who barked loudly at the good news.",
+  ],
+  spotlight:{quote:"\"We <b>are going to</b> save money,\" said Claire. \"Where <b>will</b> we go?\" asked Jack.",
+    hint:"Two different future forms appear side by side here. One describes an already-made plan; the other is used right at the moment of deciding or asking. Can you tell which is which?"},
+  glossary:[],
+  vocab:[["future","🔮","the time that has not happened yet"],
+    ["save money","💰","to keep money instead of spending it"],
+    ["trip","🧳","a journey to a place"],
+    ["excited","🤩","feeling happy and full of energy about something"],
+    ["museum","🏛️","a building where old or interesting objects are shown"],
+    ["cheer","🙌","to shout happily"],
+    ["bark","🐕","the sound a dog makes"],
+    ["loudly","🔊","with a lot of sound"],
+    ["somewhere","🌍","in or to a place, not specified"],
+    ["finally","🏁","after a long time"]],
+  exerciseA:{
+    text:"After David's promotion, the family talked about their <b1>. Claire said they would <b2> money every month. Emma wanted to visit a real <b3>. David said the family would visit London next <b4>. Everyone <b5> at the good news.",
+    blanks:[
+      {answer:"future", options:["future","garden","dinner"]},
+      {answer:"save", options:["save","spend","lose"]},
+      {answer:"museum", options:["museum","office","kitchen"]},
+      {answer:"summer", options:["summer","morning","company"]},
+      {answer:"cheered", options:["cheered","cried","slept"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What did Claire say the family would do every month?", model:"Claire said they would save some money every month."},
+      {q:"Where does Emma want to go?", model:"Emma wants to go to London and visit a museum."},
+      {q:"When will the family visit London?", model:"The family will visit London next summer."},
+    ]
+  },
+  exerciseC:{
+    title:"Future forms: 'will' and 'going to'",
+    items:[
+      {prompt:"We use 'going to' for a plan we have already decided: 'We ___ to save money.'", options:["will","are going","go"], correct:1},
+      {prompt:"We often use 'will' for a decision made at the moment of speaking: 'Where ___ we go?'", options:["will","are going","did"], correct:0},
+      {prompt:"'Next summer, the family is going to visit London' tells us this is ___.", options:["a decided plan","a surprise decision","a past event"], correct:0},
+    ]
+  },
+  grammarNote:{
+    title:"Two Ways to Talk About the Future",
+    text:"English has two common ways to talk about the future. We use 'going to' for plans we have already made: 'We are going to visit London.' We use 'will' more for decisions made right at that moment, promises, or general future facts: 'Next year, we will take a big trip.' Both are correct — the small difference is in how planned the idea feels."
+  }
+},
+{
+  id:11, series:3, title:"Planning the Trip", emoji:"🧳", cast:["david","claire","emma","jack"],
+  text:[
+    "During the winter, the Turner family started planning their trip to London carefully. They made a <g w='budget'>budget</g> — a plan for how much money they could spend.",
+    "Claire looked online for train tickets, while David called a small hotel near the center of London to check the price of a room for five nights.",
+    "\"We can't afford a very expensive hotel,\" said David, \"but this one looks comfortable, and it isn't too far from the museums.\"",
+    "Emma made a list of all the places she wanted to visit: the British Museum, a famous park, and a market where people sell old books. Jack wanted to see a football match if there was time.",
+  ],
+  spotlight:{quote:"\"We <b>can't afford</b> a very expensive hotel,\" said David.",
+    hint:"'Can't' + 'afford' together mean something specific about money — not just 'not able to', but 'not having enough money for'. Try to guess the exact meaning before checking the word list."},
+  glossary:[
+    {term:"budget", def:"a plan of how much money you can spend"},
+  ],
+  vocab:[["budget","💰","a plan for spending money"],
+    ["ticket","🎫","a paper that lets you travel or enter somewhere"],
+    ["hotel","🏨","a building where travelers pay to sleep"],
+    ["afford","💳","to have enough money for something"],
+    ["center","📍","the middle part of a place"],
+    ["list","📝","a series of written items"],
+    ["famous","🌟","known by many people"],
+    ["match","⚽","a sports game between two teams"],
+    ["carefully","🧠","with a lot of attention and care"],
+    ["online","💻","using the internet"]],
+  exerciseA:{
+    text:"The family made a <b1> for their trip. Claire looked online for train <b2>. David called a small <b3> near the center of London. Emma made a <b4> of places to visit. Jack wanted to see a football <b5>.",
+    blanks:[
+      {answer:"budget", options:["budget","garden","report"]},
+      {answer:"tickets", options:["tickets","dogs","desks"]},
+      {answer:"hotel", options:["hotel","office","school"]},
+      {answer:"list", options:["list","museum","match"]},
+      {answer:"match", options:["match","ticket","hotel"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Why did the family make a budget?", model:"They made a budget to plan how much money they could spend."},
+      {q:"How many nights will they stay at the hotel?", model:"They will stay for five nights."},
+      {q:"What does Jack want to see in London?", model:"Jack wants to see a football match."},
+    ]
+  },
+  exerciseC:{
+    title:"Talking about ability and possibility with 'can' and 'can't'",
+    items:[
+      {prompt:"\"We ___ afford a very expensive hotel,\" said David. (it is not possible)", options:["can","can't","will"], correct:1},
+      {prompt:"'Afford' means to ___.", options:["have enough money for something","forget something","find something"], correct:0},
+      {prompt:"Which sentence means 'it is possible for them'?", options:["They can visit the museum.","They can't visit the museum.","They visited the museum."], correct:0},
+    ]
+  }
+},
+{
+  id:12, series:3, title:"Arriving in London", emoji:"🚉", cast:["david","claire","jack","emma"],
+  text:[
+    "After a long train <g w='journey'>journey</g>, the Turner family finally arrived in London. The station was big and busy, full of people hurrying in every direction.",
+    "\"Stay close to me,\" said David, holding Emma's hand. \"It's easy to get lost in a place like this.\" Jack carried the heaviest bag, and Claire held the map.",
+    "It took them a few minutes to <g w='get the hang of'>get the hang of</g> the underground train system, but soon they found the right platform and arrived at their hotel without any problems.",
+    "The hotel room was small but comfortable, just as David had said. From the window, they could see the roofs of the city and, far away, a tall clock tower.",
+  ],
+  spotlight:{quote:"It <b>took</b> them a few minutes to get the hang of the system.",
+    hint:"'It takes (someone) (time) to (do something)' is a very useful pattern for talking about how long something needs. Try building your own sentence with this pattern."},
+  glossary:[
+    {term:"journey", def:"the act of traveling from one place to another"},
+    {term:"get the hang of", def:"to learn how to do something after a little practice"},
+  ],
+  vocab:[["journey","🚆","the act of traveling from one place to another"],
+    ["station","🚉","a place where trains stop for passengers"],
+    ["hurry","🏃","to move quickly because of little time"],
+    ["direction","🧭","the way something moves or faces"],
+    ["luggage","🧳","bags and suitcases for traveling"],
+    ["underground","🚇","a train system that runs below the city"],
+    ["platform","🛤️","the area where you wait for a train"],
+    ["roof","🏠","the covering on top of a building"],
+    ["tower","🗼","a tall, narrow building or structure"],
+    ["arrive","🎯","to reach a place"]],
+  exerciseA:{
+    text:"After a long <b1>, the family arrived in London. The station was busy, full of people <b2> in every direction. Jack carried the heaviest <b3>. It took a few minutes to get the hang of the <b4> train system. From the hotel window, they could see a tall <b5>.",
+    blanks:[
+      {answer:"journey", options:["journey","garden","meeting"]},
+      {answer:"hurrying", options:["hurrying","sleeping","cooking"]},
+      {answer:"bag", options:["bag","desk","dog"]},
+      {answer:"underground", options:["underground","office","school"]},
+      {answer:"tower", options:["tower","market","report"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"What was the station like when they arrived?", model:"The station was big and busy, full of people hurrying."},
+      {q:"Who carried the heaviest bag?", model:"Jack carried the heaviest bag."},
+      {q:"What could they see from the hotel window?", model:"They could see the roofs of the city and a tall clock tower."},
+    ]
+  },
+  exerciseC:{
+    title:"Using 'it takes' for time needed to learn or do something",
+    items:[
+      {prompt:"'It took them a few minutes to get the hang of the system' means ___.", options:["they needed a few minutes to learn it","they lost a few minutes","they missed the train"], correct:0},
+      {prompt:"'Stay close to me' is an example of a ___.", options:["question","instruction","past event"], correct:1},
+      {prompt:"Which word means 'a place where a train stops so people can get on'?", options:["platform","roof","budget"], correct:0},
+    ]
+  }
+},
+{
+  id:13, series:3, title:"A Day at the Museum", emoji:"🏛️", cast:["david","claire","jack","emma"],
+  text:[
+    "On their second day, the family visited the British Museum, just as Emma had wanted. The museum was enormous, with thousands of <g w='ancient'>ancient</g> objects from all over the world.",
+    "Emma stood in front of a huge stone statue that was more than two thousand years old. \"I can't believe something this old still exists,\" she said quietly.",
+    "A museum guide explained that many objects came from ancient Egypt, Greece, and Rome. He talked about kings, wars, and everyday life from many centuries ago.",
+    "By the end of the day, the family had walked for hours and seen hundreds of objects. Jack, who usually preferred sports to history, admitted that the museum was more interesting than he had expected.",
+  ],
+  spotlight:{quote:"Jack admitted the museum was more interesting than he <b>had expected</b>.",
+    hint:"'Had expected' looks back to a feeling Jack had before the museum visit — before the story's 'now'. Compare this with 'had finished' in Chapter 8. It's the same past perfect pattern, used again in a new situation."},
+  glossary:[
+    {term:"ancient", def:"very old, from a long time ago in history"},
+  ],
+  vocab:[["enormous","🐘","extremely large"],
+    ["ancient","🏺","very old, from a long time ago"],
+    ["statue","🗿","a sculpture of a person or animal"],
+    ["exist","🌐","to be real, to be present"],
+    ["guide","🧭","a person who shows and explains things to visitors"],
+    ["century","📅","a period of one hundred years"],
+    ["admit","🗨️","to agree that something is true"],
+    ["prefer","❤️","to like one thing more than another"],
+    ["expect","🔮","to think something will happen"],
+    ["object","📦","a physical thing that can be seen and touched"]],
+  exerciseA:{
+    text:"The British Museum was <b1>, with thousands of <b2> objects. Emma saw a huge stone <b3> that was two thousand years old. A museum <b4> explained about ancient Egypt, Greece, and Rome. Jack admitted the museum was more interesting than he had <b5>.",
+    blanks:[
+      {answer:"enormous", options:["enormous","small","new"]},
+      {answer:"ancient", options:["ancient","modern","cheap"]},
+      {answer:"statue", options:["statue","ticket","report"]},
+      {answer:"guide", options:["guide","boss","dog"]},
+      {answer:"expected", options:["expected","forgotten","sold"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"How old was the stone statue Emma saw?", model:"The statue was more than two thousand years old."},
+      {q:"What did the museum guide talk about?", model:"He talked about kings, wars, and everyday life from ancient times."},
+      {q:"Did Jack enjoy the museum?", model:"Yes, Jack admitted the museum was more interesting than he had expected."},
+    ]
+  },
+  exerciseC:{
+    title:"Asking questions in the past: word order",
+    items:[
+      {prompt:"Choose the correct question: ___", options:["Where the statue came from?","Where did the statue come from?","Where does the statue come from?"], correct:1},
+      {prompt:"Choose the correct question: ___", options:["What the guide explained?","What did the guide explain?","What explain the guide?"], correct:1},
+      {prompt:"In past tense questions, we usually use the helping word ___ before the subject.", options:["did","do","will"], correct:0},
+    ]
+  },
+  grammarNote:{
+    title:"Making Questions in the Past Simple",
+    text:"To make a question in the past simple, we usually put 'did' before the subject, and the main verb goes back to its base form: 'Where did the statue come from?' (not 'came'). This is different from statements, where we simply change the verb: 'The statue came from Egypt.' Notice how 'did' carries the past meaning, so the main verb does not need to change."
+  }
+},
+{
+  id:14, series:3, title:"A Missed Train", emoji:"🚆", cast:["jack","david"],
+  text:[
+    "On their last full day, the family visited a large park in the morning and a book market in the afternoon. They lost track of time while looking at old books, and by the time they left, it was later than they thought.",
+    "They hurried to the station, but when they arrived, they saw their train leaving the platform. \"We missed it!\" said Jack, disappointed.",
+    "David checked the board and found good news: there was another train in thirty minutes. \"Let's make the best of it,\" he said with a smile. \"We can get a cup of tea while we wait.\"",
+    "They sat together at a small café in the station, laughing about the day and all the strange old books Emma had bought. In the end, missing the train did not <g w='ruin'>ruin</g> their evening at all.",
+  ],
+  spotlight:{quote:"\"Let's <b>make the best of it</b>,\" he said with a smile.",
+    hint:"This is an idiom — its meaning is not literal. Think about David's smile and the situation (a missed train). What do you think it means to 'make the best of' a bad situation?"},
+  glossary:[
+    {term:"ruin", def:"to spoil something completely, to make it bad"},
+  ],
+  vocab:[["lose track of time","⏱️","to not notice how much time has passed"],
+    ["miss","🚫","to fail to catch something, like a train"],
+    ["disappointed","😞","unhappy because something did not happen as hoped"],
+    ["board","📋","a screen or sign showing information"],
+    ["wait","⌛","to stay in a place until something happens"],
+    ["laugh","😄","to make sounds showing happiness or amusement"],
+    ["strange","🤨","unusual or surprising"],
+    ["in the end","🏁","finally, after everything"],
+    ["café","☕","a small restaurant serving drinks and light food"],
+    ["make the best of it","🌈","to find something good in a bad situation"]],
+  exerciseA:{
+    text:"The family lost track of <b1> at the book market. When they arrived at the station, they had already <b2> their train. Jack was <b3>. David found another train in thirty minutes and said, \"Let's <b4> the best of it.\" They sat at a small <b5> and laughed together.",
+    blanks:[
+      {answer:"time", options:["time","money","luggage"]},
+      {answer:"missed", options:["missed","found","sold"]},
+      {answer:"disappointed", options:["disappointed","proud","comfortable"]},
+      {answer:"make", options:["make","take","give"]},
+      {answer:"café", options:["café","museum","garden"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"Why did the family miss their train?", model:"They missed it because they lost track of time at the book market."},
+      {q:"How long did they have to wait for the next train?", model:"They had to wait thirty minutes."},
+      {q:"How did they spend the waiting time?", model:"They sat at a café, drank tea, and laughed together."},
+    ]
+  },
+  exerciseC:{
+    title:"The idiom 'to make the best of it'",
+    items:[
+      {prompt:"'Let's make the best of it' means ___.", options:["let's find something good in a bad situation","let's give up","let's complain about it"], correct:0},
+      {prompt:"'They missed the train' means ___.", options:["they arrived too late to catch it","they enjoyed the train","they cancelled the train"], correct:0},
+      {prompt:"'In the end' is used to introduce ___.", options:["the beginning of a story","the final result of a situation","a question"], correct:1},
+    ]
+  }
+},
+{
+  id:15, series:3, title:"Coming Home", emoji:"🌙", cast:["david","claire","jack","emma","max"],
+  text:[
+    "On the last morning, the Turner family packed their bags and took one final walk near the hotel before heading to the station.",
+    "\"I don't want to leave,\" said Emma. \"There is still so much to see.\" \"We will come back one day,\" said Claire, \"but for now, we have some wonderful memories.\"",
+    "On the long train journey home, everyone talked about their favorite parts of the trip: the museum, the book market, and even the missed train and the little café.",
+    "When they finally arrived home, Max ran to the door, barking with joy. \"It's good to travel,\" said David, \"but it's also good to come home.\" The family agreed, and that night, they all slept very well, full of new memories and, for the first time, a little more confident in their English too."
+  ],
+  spotlight:{quote:"\"We <b>will come back</b> one day,\" said Claire. \"...we <b>have</b> some wonderful memories.\"",
+    hint:"This sentence uses a future form and a present tense form right next to each other. By now, you have seen almost every tense in this book working together, just like in real conversation."},
+  glossary:[],
+  vocab:[["pack","🎒","to put things into a bag for travel"],
+    ["final","🏁","last, at the end"],
+    ["memory","💭","something you remember from the past"],
+    ["joy","😄","a feeling of great happiness"],
+    ["confident","😌","feeling sure of yourself"],
+    ["agree","🤝","to have the same opinion"],
+    ["wonderful","🌟","extremely good"],
+    ["one day","🗓️","at some point in the future"],
+    ["for now","⏳","at this moment, temporarily"],
+    ["full of","📦","containing a lot of something"]],
+  exerciseA:{
+    text:"On the last morning, the family <b1> their bags. Emma did not want to <b2>, but Claire said they would come back one <b3>. On the train, everyone talked about their favorite <b4>. When they arrived home, Max was full of <b5>.",
+    blanks:[
+      {answer:"packed", options:["packed","sold","lost"]},
+      {answer:"leave", options:["leave","stay","sleep"]},
+      {answer:"day", options:["day","hotel","museum"]},
+      {answer:"memories", options:["memories","tickets","deadlines"]},
+      {answer:"joy", options:["joy","anger","fear"]},
+    ]
+  },
+  exerciseB:{
+    questions:[
+      {q:"How did Emma feel about leaving London?", model:"Emma did not want to leave; she felt there was still so much to see."},
+      {q:"What did the family talk about on the train home?", model:"They talked about their favorite parts of the trip."},
+      {q:"How did Max react when the family came home?", model:"Max ran to the door, barking with joy."},
+    ]
+  },
+  exerciseC:{
+    title:"Review: Past, Present Perfect, and Future together",
+    items:[
+      {prompt:"'We will come back one day' talks about the ___.", options:["past","future","present"], correct:1},
+      {prompt:"'They have some wonderful memories' uses the ___ tense.", options:["past simple","present perfect","future"], correct:1},
+      {prompt:"'When they arrived home, Max ran to the door' uses the ___ tense.", options:["past simple","present perfect","future"], correct:0},
+    ]
+  },
+  grammarNote:{
+    title:"Looking Back: The Tenses You Have Learned",
+    text:"Throughout this story, you have met the present simple (daily routines), the past simple (single completed actions), the past perfect (an action before another past action), the present perfect (a connection between past and now), and two future forms ('will' and 'going to'). You did not learn these as a list of rules first — you met them inside a real, continuous story, the same way the Turner family's English grew a little in every chapter. That is the Nature Method."
+  }
+},
+];
+
+/* ================= STATE ================= */
+const STORAGE_KEY = "nm_state_v2";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { completedChapters:{}, wordProgress:{}, lastVisit:null, streak:0 };
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+let state = loadState();
+
+function updateStreak(){
+  const today = new Date().toDateString();
+  if(state.lastVisit !== today){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    state.streak = (state.lastVisit === y.toDateString()) ? state.streak + 1 : 1;
+    state.lastVisit = today;
+    saveState();
+  }
+}
+updateStreak();
+
+/* ================= NAV ================= */
+function showScreen(name){
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+name).classList.add("active");
+  document.querySelectorAll(".navbar button").forEach(b=>b.classList.remove("active"));
+  const nb = document.querySelector('.navbar button[data-nav="'+name+'"]');
+  if(nb) nb.classList.add("active");
+  if(name==="home") renderHome();
+  if(name==="progress") renderProgress();
+}
+
+function renderHome(){
+  const doneCount = Object.keys(state.completedChapters).length;
+  document.getElementById("stat-chapters").textContent = doneCount + "/" + CHAPTERS.length;
+  const wordCount = Object.values(state.wordProgress).filter(w=>w.known).length;
+  document.getElementById("stat-words").textContent = wordCount;
+  document.getElementById("stat-streak").textContent = state.streak;
+
+  const container = document.getElementById("series-list");
+  container.innerHTML = "";
+  let firstIncompleteFound = false;
+  SERIES.forEach(s=>{
+    const chs = CHAPTERS.filter(c=>c.series===s.id);
+    const doneInSeries = chs.filter(c=>state.completedChapters[c.id]).length;
+    const block = document.createElement("div");
+    let html = `<div class="series-title"><span class="dot" style="background:${s.color}"></span>${s.title} — ${s.theme}</div>`;
+    if(doneInSeries===chs.length){
+      html += `<div class="series-badge">🏆 Series Complete!</div>`;
+    }
+    html += `<div class="map-path">`;
+    chs.forEach(ch=>{
+      const globalIndex = CHAPTERS.findIndex(c=>c.id===ch.id);
+      const prevDone = globalIndex===0 || state.completedChapters[CHAPTERS[globalIndex-1].id];
+      const done = state.completedChapters[ch.id];
+      const locked = !prevDone && !done;
+      const isCurrent = !done && prevDone && !firstIncompleteFound;
+      if(isCurrent) firstIncompleteFound = true;
+      html += `<div class="map-node ${locked?'locked':''}" ${locked?'':`onclick="openChapter(${ch.id})"`}>
+        <div class="map-circle ${done?'done':''} ${isCurrent?'current':''}">${done?'✓':ch.emoji}</div>
+        <div class="map-info">
+          <div class="title">Ch. ${ch.id} — ${ch.title}</div>
+          <div class="meta">${locked?'🔒 Finish the previous chapter to unlock':(done?'Completed':'Ready to start')}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    block.innerHTML = html;
+    container.appendChild(block);
+  });
+}
+
+/* ================= CHAPTER READER ================= */
+let currentChapter = null;
+function openChapter(id){
+  currentChapter = CHAPTERS.find(c=>c.id===id);
+  showScreen("chapter");
+  document.getElementById("ch-title").textContent = currentChapter.emoji + " Chapter " + currentChapter.id + ": " + currentChapter.title;
+  const seriesInfo = SERIES.find(s=>s.id===currentChapter.series);
+  document.getElementById("ch-meta").textContent = seriesInfo.title;
+  switchTab('read');
+  renderReadTab();
+  renderVocabTab();
+  renderPlayTab();
+  renderExercisesTab();
+}
+function exitChapter(){ showScreen("home"); }
+
+function switchTab(tab){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector('.tab-btn[data-tab="'+tab+'"]').classList.add("active");
+  document.getElementById("tab-read").style.display = tab==="read" ? "block":"none";
+  document.getElementById("tab-vocab").style.display = tab==="vocab" ? "block":"none";
+  document.getElementById("tab-play").style.display = tab==="play" ? "block":"none";
+  document.getElementById("tab-exercises").style.display = tab==="exercises" ? "block":"none";
+}
+
+function glossify(text){
+  return text.replace(/<g w='([^']+)'>([^<]+)<\/g>/g, (m, w, label)=>{
+    return `<span class="gloss" onclick="toggleGloss(this,'${w.replace(/'/g,"\\'")}')">${label}</span>`;
+  });
+}
+function toggleGloss(el, word){
+  const existing = el.nextElementSibling;
+  if(existing && existing.classList.contains('gloss-popup')){ existing.remove(); return; }
+  document.querySelectorAll('.gloss-popup').forEach(p=>p.remove());
+  const def = (currentChapter.glossary.find(g=>g.term===word)||{}).def || "";
+  const popup = document.createElement('div');
+  popup.className = 'gloss-popup show';
+  popup.textContent = `${word} = ${def}`;
+  el.insertAdjacentElement('afterend', popup);
+}
+
+function renderReadTab(){
+  const el = document.getElementById("tab-read");
+  let html = `<div class="illustration-frame">${ILLUSTRATIONS[currentChapter.id] ? ILLUSTRATIONS[currentChapter.id]() : ''}</div>`;
+  html += castStrip(currentChapter.cast);
+  html += `<div class="story-text">`;
+  currentChapter.text.forEach(p=>{ html += `<p>${glossify(p)}</p>`; });
+  html += `</div>`;
+  if(currentChapter.spotlight){
+    html += `<div class="spotlight"><span class="label">🔍 Look closely</span>${currentChapter.spotlight.quote}<br><br>${currentChapter.spotlight.hint}</div>`;
+  }
+  if(currentChapter.grammarNote){
+    html += `<div class="grammar-note"><h3>${currentChapter.grammarNote.title}</h3><p>${currentChapter.grammarNote.text}</p></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderVocabTab(){
+  const el = document.getElementById("tab-vocab");
+  let html = `<div class="vocab-list">`;
+  currentChapter.vocab.forEach(([w,emoji,def])=>{
+    const key = currentChapter.id+"_"+w;
+    const prog = state.wordProgress[key];
+    const known = prog && prog.known;
+    html += `<div class="vocab-row">
+      <div class="vocab-emoji">${emoji}</div>
+      <div style="flex:1;">
+        <div class="vocab-word">${w} ${known?'✓':''}</div>
+        <div class="vocab-def">${def}</div>
+      </div>
+      <div class="vocab-actions">
+        <button class="icon-btn ${known===false?'active-no':''}" onclick="markWord('${key}', false)">😕</button>
+        <button class="icon-btn ${known===true?'active-yes':''}" onclick="markWord('${key}', true)">✅</button>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+function markWord(key, known){
+  state.wordProgress[key] = { known };
+  saveState();
+  renderVocabTab();
+}
+
+/* ---- Matching game (Play tab) ---- */
+let matchState = null;
+function renderPlayTab(){
+  const el = document.getElementById("tab-play");
+  const words = currentChapter.vocab.map(v=>({word:v[0], emoji:v[1]}));
+  const wordTiles = words.map((w,i)=>({type:'word', text:w.word, pairId:i}));
+  const emojiTiles = words.map((w,i)=>({type:'emoji', text:w.emoji, pairId:i}));
+  let all = wordTiles.concat(emojiTiles);
+  all = all.sort(()=>Math.random()-0.5);
+  matchState = { tiles: all, selected:[], matched:[] };
+  el.innerHTML = `<p class="sub">Match each word with its picture. Tap two tiles to check.</p>
+    <div class="match-status" id="match-status">0 / ${words.length} matched</div>
+    <div class="match-grid" id="match-grid"></div>`;
+  renderMatchGrid();
+}
+function renderMatchGrid(){
+  const grid = document.getElementById("match-grid");
+  grid.innerHTML = matchState.tiles.map((t,i)=>{
+    const isMatched = matchState.matched.includes(i);
+    const isSelected = matchState.selected.includes(i);
+    const content = t.type==='emoji' ? `<span class="emoji">${t.text}</span>` : t.text;
+    return `<div class="match-tile ${isSelected?'selected':''} ${isMatched?'matched':''}" ${isMatched?'':`onclick="selectTile(${i})"`}>${content}</div>`;
+  }).join('');
+}
+function selectTile(i){
+  if(matchState.selected.includes(i) || matchState.matched.includes(i)) return;
+  matchState.selected.push(i);
+  renderMatchGrid();
+  if(matchState.selected.length===2){
+    const [a,b] = matchState.selected;
+    const tileA = matchState.tiles[a], tileB = matchState.tiles[b];
+    if(tileA.pairId===tileB.pairId && tileA.type!==tileB.type){
+      matchState.matched.push(a,b);
+      matchState.selected = [];
+      document.getElementById("match-status").textContent = (matchState.matched.length/2) + " / " + (matchState.tiles.length/2) + " matched";
+      renderMatchGrid();
+    } else {
+      setTimeout(()=>{ matchState.selected = []; renderMatchGrid(); }, 550);
+    }
+  }
+}
+
+function renderExercisesTab(){
+  const el = document.getElementById("tab-exercises");
+  let html = "";
+  html += `<div class="exercise-block"><div class="section-label">Exercise A — Fill in the Blanks</div>`;
+  let textA = currentChapter.exerciseA.text;
+  currentChapter.exerciseA.blanks.forEach((b,i)=>{
+    const opts = b.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+    const selectHtml = `<select class="blank" id="blankA${i}" data-answer="${b.answer}"><option value="">...</option>${opts}</select>`;
+    textA = textA.replace(`<b${i+1}>`, selectHtml);
+  });
+  html += `<div class="blank-sentence">${textA}</div>`;
+  html += `<button class="btn small" onclick="checkExerciseA()">Check Answers</button></div>`;
+
+  html += `<div class="exercise-block"><div class="section-label">Exercise B — Comprehension Questions</div>`;
+  currentChapter.exerciseB.questions.forEach((q,i)=>{
+    html += `<div class="q-item">
+      <div class="q">${i+1}. ${q.q}</div>
+      <textarea placeholder="Write your answer in a full sentence..."></textarea>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Show a model answer</button>
+      <div class="model-answer">${q.model}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="exercise-block"><div class="section-label">Exercise C — ${currentChapter.exerciseC.title}</div>`;
+  currentChapter.exerciseC.items.forEach((it,i)=>{
+    html += `<div class="mc-item"><div class="prompt">${i+1}. ${it.prompt}</div>`;
+    it.options.forEach((opt,oi)=>{
+      html += `<button class="mc-opt" onclick="checkMC(this, ${oi===it.correct})">${opt}</button>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+
+  html += `<button class="btn" onclick="completeChapter()">✓ Mark Chapter as Complete</button>`;
+  el.innerHTML = html;
+}
+
+function checkExerciseA(){
+  currentChapter.exerciseA.blanks.forEach((b,i)=>{
+    const sel = document.getElementById("blankA"+i);
+    sel.classList.remove("correct","wrong");
+    if(sel.value === b.answer) sel.classList.add("correct");
+    else if(sel.value !== "") sel.classList.add("wrong");
+  });
+}
+function checkMC(btn, isCorrect){
+  const group = btn.parentElement.querySelectorAll(".mc-opt");
+  group.forEach(b=>b.onclick=null);
+  btn.classList.add(isCorrect ? "correct" : "wrong");
+}
+
+function completeChapter(){
+  const wasAlreadyDone = !!state.completedChapters[currentChapter.id];
+  state.completedChapters[currentChapter.id] = true;
+  currentChapter.vocab.forEach(v=>{
+    const key = currentChapter.id+"_"+v[0];
+    if(!state.wordProgress[key]) state.wordProgress[key] = { known:true };
+  });
+  saveState();
+  if(!wasAlreadyDone) celebrate();
+  else showScreen("home");
+}
+
+function celebrate(){
+  const overlay = document.getElementById("celebrate-overlay");
+  const colors = ["#a8562c","#3f7a5c","#d9a441","#3f6a8f","#c9564f"];
+  let confettiHtml = "";
+  for(let i=0;i<40;i++){
+    const left = Math.random()*100;
+    const delay = Math.random()*0.4;
+    const duration = 1.6 + Math.random()*1.2;
+    const color = colors[i % colors.length];
+    confettiHtml += `<div class="confetti-piece" style="left:${left}%; background:${color}; animation-duration:${duration}s; animation-delay:${delay}s;"></div>`;
+  }
+  const doneCount = Object.keys(state.completedChapters).length;
+  overlay.innerHTML = confettiHtml + `<div class="celebrate-card">
+    <div class="big">🎉</div>
+    <h3>Chapter Complete!</h3>
+    <p>You've finished ${doneCount} of ${CHAPTERS.length} chapters. Great progress!</p>
+    <button class="btn" onclick="closeCelebrate()">Continue</button>
+  </div>`;
+  overlay.classList.add("show");
+}
+function closeCelebrate(){
+  document.getElementById("celebrate-overlay").classList.remove("show");
+  document.getElementById("celebrate-overlay").innerHTML = "";
+  showScreen("home");
+}
+
+/* ================= AUDIO ================= */
+function playChapterAudio(){
+  if(!('speechSynthesis' in window) || !currentChapter) return;
+  const btn = document.getElementById("listen-btn");
+  if(speechSynthesis.speaking){ speechSynthesis.cancel(); btn.classList.remove("playing"); return; }
+  const plainText = currentChapter.text.map(p=>p.replace(/<g w='[^']+'>([^<]+)<\/g>/g, "$1")).join(" ");
+  const utter = new SpeechSynthesisUtterance(plainText);
+  utter.lang = "en-US";
+  utter.rate = 0.92;
+  utter.onstart = ()=>btn.classList.add("playing");
+  utter.onend = ()=>btn.classList.remove("playing");
+  speechSynthesis.speak(utter);
+}
+
+/* ================= PROGRESS SCREEN ================= */
+function renderProgress(){
+  const badgeRow = document.getElementById("badge-row");
+  let badges = "";
+  SERIES.forEach(s=>{
+    const chs = CHAPTERS.filter(c=>c.series===s.id);
+    const doneInSeries = chs.filter(c=>state.completedChapters[c.id]).length;
+    if(doneInSeries===chs.length) badges += `<span class="badge">🏆 ${s.theme}</span>`;
+  });
+  const doneCount = Object.keys(state.completedChapters).length;
+  if(doneCount >= 1) badges += `<span class="badge">📖 First Chapter</span>`;
+  if(doneCount >= CHAPTERS.length) badges += `<span class="badge">👑 Whole Story Finished</span>`;
+  if(state.streak >= 3) badges += `<span class="badge">🔥 ${state.streak}-Day Streak</span>`;
+  badgeRow.innerHTML = badges || '<span class="empty" style="padding:4px 0;">Complete chapters to earn badges!</span>';
+
+  const wordsEl = document.getElementById("progress-words");
+  const knownWords = Object.entries(state.wordProgress).filter(([k,v])=>v.known);
+  if(!knownWords.length){
+    wordsEl.innerHTML = '<div class="empty">No words learned yet — start with Chapter 1!</div>';
+  } else {
+    wordsEl.innerHTML = knownWords.map(([k])=>{
+      const word = k.split("_").slice(1).join("_");
+      return `<div class="vocab-row"><span class="vocab-word">${word}</span></div>`;
+    }).join('');
+  }
+  const chEl = document.getElementById("progress-chapters");
+  const doneIds = Object.keys(state.completedChapters).map(Number).sort((a,b)=>a-b);
+  if(!doneIds.length){
+    chEl.innerHTML = '<div class="empty">No chapters completed yet.</div>';
+  } else {
+    chEl.innerHTML = doneIds.map(id=>{
+      const ch = CHAPTERS.find(c=>c.id===id);
+      return `<div class="vocab-row"><span class="vocab-word">${ch.emoji} Chapter ${ch.id}</span> — ${ch.title}</div>`;
+    }).join('');
+  }
+}
+
+/* ================= INIT ================= */
+renderHome();
+</script>
+</body>
+</html>
