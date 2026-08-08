@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>İngilizce Pratik</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#181b23; --border:#2a2e3a; --text:#eef0f4; --muted:#9aa0ab;
+    --accent:#7c6cf0; --accent2:#22c98d; --warn:#f2b84b; --bad:#ef5b5b;
+    --grad1:#7c6cf0; --grad2:#4fc3f7; --grad3:#f7b733; --grad4:#ff6b9d;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{height:100%;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:radial-gradient(circle at top,#181c28,var(--bg) 60%);color:var(--text);padding-bottom:74px;}
+  .screen{display:none; padding:22px 16px 24px; max-width:540px; margin:0 auto; animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  @keyframes pop{0%{transform:scale(0.9);} 60%{transform:scale(1.04);} 100%{transform:scale(1);}}
+  @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
+  @keyframes floatUp{0%{opacity:0; transform:translateY(10px) scale(0.8);} 100%{opacity:1; transform:translateY(0) scale(1);}}
+  h1{font-size:1.4rem; margin:4px 0 2px; display:flex; align-items:center; gap:8px;}
+  h2{font-size:1.08rem; margin:0 0 12px;}
+  .sub{color:var(--muted); font-size:0.88rem; margin:0 0 20px;}
+  .hero{background:linear-gradient(135deg,var(--grad1),var(--grad2)); border-radius:20px; padding:20px;
+    margin-bottom:18px; box-shadow:0 8px 24px rgba(124,108,240,0.25);}
+  .hero h1{color:white; margin:0 0 4px;}
+  .hero p{color:rgba(255,255,255,0.9); margin:0; font-size:0.88rem;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:10px 6px; text-align:center;}
+  .stat .num{font-size:1.3rem; font-weight:800;}
+  .stat .label{color:var(--muted); font-size:0.65rem; margin-top:2px;}
+  .stat.streak .num{color:var(--grad3);}
+  .stat.scn .num{color:var(--grad2);}
+  .stat.wrd .num{color:var(--accent2);}
+  .stat.rdg .num{color:var(--grad4);}
+  .btn{display:block; width:100%; text-align:center; background:linear-gradient(135deg,var(--accent),#5a4fd8);
+    color:white; border:none; border-radius:14px; padding:15px; font-size:0.96rem; font-weight:700; cursor:pointer;
+    margin-top:8px; box-shadow:0 4px 14px rgba(124,108,240,0.35);}
+  .btn.secondary{background:transparent; box-shadow:none; border:1px solid var(--border); color:var(--text);}
+  .btn:active{transform:scale(0.98);}
+  .scenario-item{display:flex; align-items:center; gap:12px; padding:14px; background:var(--card);
+    border:1px solid var(--border); border-radius:16px; margin-bottom:10px; cursor:pointer; position:relative; overflow:hidden;}
+  .scenario-item::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--cat-color,var(--accent));}
+  .scenario-item .emoji{font-size:1.7rem; background:var(--card); border-radius:12px; padding:6px 10px;}
+  .scenario-item .info{flex:1;}
+  .scenario-item .title{font-weight:700; font-size:0.96rem;}
+  .scenario-item .desc{color:var(--muted); font-size:0.8rem; margin-top:2px;}
+  .scenario-item .cat{display:inline-block; font-size:0.65rem; padding:2px 8px; border-radius:99px; margin-top:5px;
+    background:var(--cat-color,var(--accent)); color:#12131a; font-weight:700;}
+  .scenario-item .done{color:var(--accent2); font-size:0.78rem; margin-top:4px; font-weight:600;}
+  .topbar{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .back{background:none; border:none; color:var(--accent); font-size:1rem; cursor:pointer; padding:6px 0; font-weight:600;}
+  .npc-bubble{background:var(--card); border:1px solid var(--border); border-radius:16px 16px 16px 4px;
+    padding:15px; margin-bottom:16px; font-size:1.02rem; line-height:1.45; animation:floatUp .3s ease;}
+  .npc-role{color:var(--muted); font-size:0.72rem; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; font-weight:700;}
+  .choice{display:block; width:100%; text-align:left; background:var(--card); border:1.5px solid var(--border);
+    border-radius:14px; padding:14px; margin-bottom:10px; color:var(--text); font-size:0.93rem; cursor:pointer;
+    transition:transform .12s;}
+  .choice:active{transform:scale(0.98);}
+  .choice.correct{border-color:var(--accent2); background:rgba(34,201,141,0.12); animation:pop .3s ease;}
+  .choice.wrong{border-color:var(--bad); background:rgba(239,91,91,0.12); animation:shake .3s ease;}
+  .feedback{background:var(--card); border-left:4px solid var(--accent2); border-radius:12px; padding:13px 15px;
+    margin:10px 0 16px; font-size:0.89rem; color:var(--muted); animation:floatUp .3s ease;}
+  .feedback.bad{border-left-color:var(--bad);}
+  .progressbar{height:8px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:20px;}
+  .progressbar-fill{height:100%; background:linear-gradient(90deg,var(--grad1),var(--grad2)); border-radius:99px; transition:width .35s;}
+  .flash-card{background:linear-gradient(160deg,var(--card),#1e2230); border:1px solid var(--border); border-radius:22px; padding:44px 20px;
+    text-align:center; min-height:210px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; margin-bottom:20px; box-shadow:0 10px 30px rgba(0,0,0,0.25);}
+  .flash-word{font-size:1.7rem; font-weight:800;}
+  .flash-example{color:var(--muted); font-size:0.86rem; margin-top:14px; font-style:italic;}
+  .flash-hint{color:var(--muted); font-size:0.76rem; margin-top:16px;}
+  .flash-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .btn-bad{background:linear-gradient(135deg,var(--bad),#c94444); box-shadow:0 4px 14px rgba(239,91,91,0.3);}
+  .btn-good{background:linear-gradient(135deg,var(--accent2),#1a9c6f); box-shadow:0 4px 14px rgba(34,201,141,0.3);}
+  .navbar{position:fixed; bottom:0; left:0; right:0; background:rgba(24,27,35,0.97); backdrop-filter:blur(8px);
+    border-top:1px solid var(--border); display:flex; padding:8px 2px calc(8px + env(safe-area-inset-bottom));}
+  .navbar button{flex:1; background:none; border:none; color:var(--muted); font-size:0.64rem; padding:6px 0; cursor:pointer; font-weight:600;}
+  .navbar button.active{color:var(--accent);}
+  .navbar .icon{font-size:1.3rem; display:block;}
+  .word-row{display:flex; justify-content:space-between; align-items:baseline; padding:10px 0; border-bottom:1px solid var(--border);}
+  .word-row:last-child{border-bottom:none;}
+  .word-en{font-weight:700;}
+  .word-tr{color:var(--muted); font-size:0.85rem;}
+  .tag{display:inline-block; font-size:0.68rem; padding:3px 9px; border-radius:99px; margin-left:6px; font-weight:700;}
+  .tag.new{background:rgba(124,108,240,0.2); color:var(--accent);}
+  .tag.learning{background:rgba(242,184,75,0.2); color:var(--warn);}
+  .tag.known{background:rgba(34,201,141,0.2); color:var(--accent2);}
+  .empty{color:var(--muted); font-size:0.9rem; text-align:center; padding:24px 0;}
+  .reading-item{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:15px; margin-bottom:10px; cursor:pointer;}
+  .reading-item .title{font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:8px;}
+  .reading-item .meta{color:var(--muted); font-size:0.78rem; margin-top:4px;}
+  .passage{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:18px;
+    font-size:0.96rem; line-height:1.65;}
+  .q-block{margin-bottom:18px;}
+  .q-text{font-weight:700; margin-bottom:10px; font-size:0.95rem;}
+  .celebrate{text-align:center; font-size:3rem; margin:10px 0; animation:pop .4s ease;}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .streak-flame{display:inline-block; animation:pop .5s ease;}
+  .score-pill{display:inline-block; background:linear-gradient(135deg,var(--grad3),#e59400); color:#241a00; font-weight:800;
+    padding:6px 14px; border-radius:99px; font-size:0.85rem; margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <h1>🇬🇧 İngilizce Pratik</h1>
+    <p>Senaryolarla konuş, kelime öğren, metin oku — hepsi tek yerde.</p>
+  </div>
+  <div class="stat-grid">
+    <div class="stat streak"><div class="num"><span class="streak-flame" id="streak-flame">🔥</span> <span id="stat-streak">0</span></div><div class="label">Gün Serisi</div></div>
+    <div class="stat scn"><div class="num" id="stat-scenarios">0/10</div><div class="label">Senaryo</div></div>
+    <div class="stat wrd"><div class="num" id="stat-words">0</div><div class="label">Kelime</div></div>
+    <div class="stat rdg"><div class="num" id="stat-readings">0/5</div><div class="label">Metin</div></div>
+  </div>
+  <div class="card">
+    <h2>🎭 Senaryo Pratiği</h2>
+    <p class="sub" style="margin-bottom:12px;">Gerçek hayat diyaloglarında en doğal cevabı seç.</p>
+    <button class="btn" onclick="showScreen('scenarios')">Senaryolara Git</button>
+  </div>
+  <div class="card">
+    <h2>📚 Kelime Kartları</h2>
+    <p class="sub" style="margin-bottom:12px;">Günlük hayatta işine yarayacak kelime ve ifadeler.</p>
+    <button class="btn" onclick="startFlashcards()">Kartlara Başla</button>
+  </div>
+  <div class="card">
+    <h2>📖 Metin Okuma</h2>
+    <p class="sub" style="margin-bottom:12px;">Kısa metinler oku, anlama sorularını cevapla.</p>
+    <button class="btn" onclick="showScreen('readings')">Metinlere Git</button>
+  </div>
+</div>
+
+<!-- SCENARIO LIST -->
+<div class="screen" id="screen-scenarios">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">← Geri</button></div>
+  <h1>🎭 Senaryolar</h1>
+  <p class="sub">Bir senaryo seç, karşındaki kişiyle konuş.</p>
+  <div id="scenario-list"></div>
+</div>
+
+<!-- SCENARIO PLAY -->
+<div class="screen" id="screen-play">
+  <div class="topbar"><button class="back" onclick="exitScenario()">← Çık</button></div>
+  <h2 id="play-title"></h2>
+  <div class="progressbar"><div class="progressbar-fill" id="play-progress"></div></div>
+  <div id="play-body"></div>
+</div>
+
+<!-- SCENARIO DONE -->
+<div class="screen" id="screen-done">
+  <div class="celebrate">🎉</div>
+  <h1>Tamamlandı!</h1>
+  <p class="sub" id="done-summary"></p>
+  <button class="btn" onclick="showScreen('scenarios')">Diğer Senaryolar</button>
+  <button class="btn secondary" onclick="showScreen('home')">Ana Sayfa</button>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="screen" id="screen-flash">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">← Geri</button></div>
+  <h2 id="flash-counter"></h2>
+  <div class="progressbar"><div class="progressbar-fill" id="flash-progress"></div></div>
+  <div class="flash-card" id="flash-card" onclick="flipCard()">
+    <div class="flash-word" id="flash-front">word</div>
+    <div class="flash-example" id="flash-example" style="display:none;"></div>
+    <div class="flash-hint" id="flash-hint">✨ Anlamı görmek için karta dokun</div>
+  </div>
+  <div class="flash-actions" id="flash-actions" style="display:none;">
+    <button class="btn btn-bad" onclick="answerCard(false)">😕 Zorlandım</button>
+    <button class="btn btn-good" onclick="answerCard(true)">✅ Biliyordum</button>
+  </div>
+</div>
+<div class="screen" id="screen-flash-done">
+  <div class="celebrate">👏</div>
+  <h1>Oturum bitti</h1>
+  <p class="sub" id="flash-done-summary"></p>
+  <button class="btn" onclick="startFlashcards()">Tekrar Çalış</button>
+  <button class="btn secondary" onclick="showScreen('home')">Ana Sayfa</button>
+</div>
+
+<!-- READING LIST -->
+<div class="screen" id="screen-readings">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">← Geri</button></div>
+  <h1>📖 Metin Okuma</h1>
+  <p class="sub">Kısa bir metin oku, sonra anlama sorularını cevapla.</p>
+  <div id="reading-list"></div>
+</div>
+
+<!-- READING PLAY -->
+<div class="screen" id="screen-reading-play">
+  <div class="topbar"><button class="back" onclick="showScreen('readings')">← Çık</button></div>
+  <h2 id="reading-title"></h2>
+  <div class="passage" id="reading-passage"></div>
+  <div id="reading-questions"></div>
+  <button class="btn" id="reading-submit" onclick="submitReading()">Cevapları Kontrol Et</button>
+</div>
+
+<!-- READING DONE -->
+<div class="screen" id="screen-reading-done">
+  <div class="celebrate">📗</div>
+  <h1>Metin tamamlandı!</h1>
+  <p class="sub" id="reading-done-summary"></p>
+  <div style="text-align:center;"><span class="score-pill" id="reading-score-pill"></span></div>
+  <button class="btn" onclick="showScreen('readings')">Diğer Metinler</button>
+  <button class="btn secondary" onclick="showScreen('home')">Ana Sayfa</button>
+</div>
+
+<!-- WORD LIST / PROGRESS -->
+<div class="screen" id="screen-words">
+  <div class="topbar"><button class="back" onclick="showScreen('home')">← Geri</button></div>
+  <h1>📊 İlerlemem</h1>
+  <div class="card">
+    <h2>Kelime Listem</h2>
+    <div id="word-list-card"></div>
+  </div>
+  <div class="card">
+    <h2>Tamamlanan Senaryolar</h2>
+    <div id="scenario-progress-card"></div>
+  </div>
+  <div class="card">
+    <h2>Okuduğum Metinler</h2>
+    <div id="reading-progress-card"></div>
+  </div>
+</div>
+
+<div class="navbar">
+  <button onclick="showScreen('home')" data-nav="home"><span class="icon">🏠</span>Ana Sayfa</button>
+  <button onclick="showScreen('scenarios')" data-nav="scenarios"><span class="icon">🎭</span>Senaryolar</button>
+  <button onclick="startFlashcards()" data-nav="flash"><span class="icon">📚</span>Kelimeler</button>
+  <button onclick="showScreen('readings')" data-nav="readings"><span class="icon">📖</span>Okuma</button>
+  <button onclick="showScreen('words')" data-nav="words"><span class="icon">📊</span>İlerleme</button>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const VOCAB = [
+  ["to be honest","açıkçası","To be honest, I don't really like this restaurant."],
+  ["I guess","sanırım","I guess we should leave soon."],
+  ["it depends","duruma göre değişir","It depends on the weather tomorrow."],
+  ["to figure out","çözmek, anlamak","I need to figure out how this works."],
+  ["to look forward to","dört gözle beklemek","I'm looking forward to the weekend."],
+  ["by the way","bu arada","By the way, did you finish the report?"],
+  ["to get along with","iyi anlaşmak","I get along with my coworkers really well."],
+  ["to bring up","gündeme getirmek","She brought up an interesting point in the meeting."],
+  ["to catch up","hasret gidermek, güncel olmak","Let's catch up over coffee sometime."],
+  ["to put off","ertelemek","Don't put off your homework until the last minute."],
+  ["a bit","biraz","I'm a bit tired today."],
+  ["to make sense","mantıklı olmak","That explanation makes a lot of sense."],
+  ["in the meantime","bu arada, o esnada","In the meantime, let's start with the basics."],
+  ["to run into someone","biriyle karşılaşmak","I ran into my old teacher yesterday."],
+  ["as far as I know","bildiğim kadarıyla","As far as I know, the store closes at 9."],
+  ["to give up","vazgeçmek","Don't give up, you're almost there."],
+  ["to point out","belirtmek, işaret etmek","He pointed out a mistake in the document."],
+  ["to deal with","ele almak, uğraşmak","I have to deal with a difficult client today."],
+  ["on the other hand","öte yandan","On the other hand, this option is cheaper."],
+  ["to come up with","bulmak (fikir vb.)","We need to come up with a better plan."],
+  ["to take care of","ilgilenmek, halletmek","I'll take care of the bill."],
+  ["kind of / sort of","bir nevi, gibi","It's kind of complicated to explain."],
+  ["to keep in touch","irtibatı sürdürmek","Let's keep in touch after the trip."],
+  ["to show up","gelmek, çıkagelmek","He showed up late to the meeting."],
+  ["to be up to","bir şeyle meşgul olmak / karar sana ait","What are you up to this weekend?"],
+  ["actually","aslında","Actually, I think you're right about that."],
+  ["to work out","işe yaramak, sonuçlanmak","I hope everything works out fine."],
+  ["to hang out","takılmak, vakit geçirmek","Do you want to hang out this weekend?"],
+  ["to look into","araştırmak, incelemek","I'll look into the issue and get back to you."],
+  ["to be worth it","değmek","The trip was expensive but worth it."],
+  ["to end up","sonunda ... olmak","We ended up staying home all night."],
+  ["to take up","başlamak (hobi vb.)","She took up painting last year."],
+  ["to turn out","ortaya çıkmak, sonuçlanmak","It turned out to be a great idea."],
+  ["to get over","atlatmak","It took a while to get over the flu."],
+  ["once in a while","ara sıra","We go hiking once in a while."],
+  ["to count on","güvenmek","You can always count on your family."],
+  ["to fall through","suya düşmek (plan)","Our vacation plans fell through."],
+  ["to make up for","telafi etmek","He bought her flowers to make up for being late."],
+  ["to pick up on","fark etmek","I picked up on the tension in the room."],
+  ["at the end of the day","sonuçta, netice itibariyle","At the end of the day, it's your decision."],
+];
+
+const CAT_COLORS = { yemek:"#f7b733", is:"#4fc3f7", sosyal:"#ff6b9d", seyahat:"#22c98d", gunluk:"#7c6cf0" };
+const CAT_LABELS = { yemek:"Yemek", is:"İş", sosyal:"Sosyal", seyahat:"Seyahat", gunluk:"Günlük Hayat" };
+
+const SCENARIOS = [
+  { id:"restaurant", emoji:"🍽️", title:"Restoranda Sipariş", desc:"Garsonla konuşarak sipariş ver", cat:"yemek",
+    steps:[
+      { npc:"Hi there! Table for one, or are you meeting someone?", choices:[
+        {t:"Just me tonight.", correct:true, fb:"Kısa ve doğal — böyle durumlarda uzun cümle kurmaya gerek yok."},
+        {t:"I alone come here eat food.", correct:false, fb:"Dilbilgisi hatalı ve gereksiz uzun; 'Just me' yeterli."},
+        {t:"Table for one person please give.", correct:false, fb:"Kelime sırası doğal değil; 'A table for one, please' daha doğru."}
+      ]},
+      { npc:"Perfect, follow me. Here's the menu — can I start you off with a drink?", choices:[
+        {t:"I'll just have water, thanks.", correct:true, fb:"Doğal ve gündelik bir cevap."},
+        {t:"Something cold and refreshing would be great, maybe a lemonade if you have one.", correct:false, fb:"Anlamı doğru ama gereksiz uzun; gerçek konuşmada daha kısa söylenir."},
+        {t:"No drink me.", correct:false, fb:"Dilbilgisi bozuk."}
+      ]},
+      { npc:"Sure thing. Have you decided what you'd like, or need another minute?", choices:[
+        {t:"Another minute, please.", correct:true, fb:"Kısa, net ve nazik."},
+        {t:"I not decide.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Give me long time to think about menu.", correct:false, fb:"Doğal değil; kısa bir istek yeterli."}
+      ]},
+      { npc:"No rush at all. ... Okay, what can I get started for you?", choices:[
+        {t:"Could I get the grilled salmon?", correct:true, fb:"'Could I get...' sipariş için çok yaygın, nazik bir kalıp."},
+        {t:"Salmon.", correct:false, fb:"Çok kısa ve kaba kaçıyor; en azından 'I'll have the salmon' demek gerekir."},
+        {t:"I want you bring me the salmon fish quickly now.", correct:false, fb:"Kaba ve doğal olmayan bir talep şekli."}
+      ]},
+      { npc:"Great choice. Would you like anything on the side?", choices:[
+        {t:"Just a salad, please.", correct:true, fb:"Net ve doğal."},
+        {t:"No.", correct:false, fb:"Çok kısa ve kaba durabilir; 'No, thanks' daha nazik."},
+        {t:"I don't know maybe something but not sure what exactly I want right now.", correct:false, fb:"Gereksiz uzun ve kararsız bir cevap."}
+      ]},
+      { npc:"All set — I'll get that started. Anything else for now?", choices:[
+        {t:"That's everything, thank you!", correct:true, fb:"Doğal bir kapanış."},
+        {t:"Finish now bye.", correct:false, fb:"Dilbilgisi hatalı ve garip."},
+        {t:"No more thing I need right now thanks a lot.", correct:false, fb:"Gereksiz uzun ve doğal olmayan."}
+      ]},
+    ]
+  },
+  { id:"interview", emoji:"💼", title:"İş Görüşmesi", desc:"Kendini tanıt ve sorulara cevap ver", cat:"is",
+    steps:[
+      { npc:"Thanks for coming in today. Tell me a bit about yourself.", choices:[
+        {t:"Sure — I've been in marketing for three years and I love working on campaigns.", correct:true, fb:"Öz ve alakalı bir tanıtım."},
+        {t:"Me good worker very hard always.", correct:false, fb:"Dilbilgisi hatalı ve belirsiz."},
+        {t:"What exactly do you want to know about me, my background, my education, or my work experience?", correct:false, fb:"Gereksiz uzun bir karşı soru; doğrudan cevap vermek beklenir."}
+      ]},
+      { npc:"What's your biggest strength?", choices:[
+        {t:"Problem-solving under pressure.", correct:true, fb:"Kısa ve net — mülakatlarda gayet doğal bir cevap."},
+        {t:"I am the best at everything you can imagine.", correct:false, fb:"Aşırı iddialı."},
+        {t:"Good.", correct:false, fb:"Çok belirsiz."}
+      ]},
+      { npc:"And a weakness you're working on?", choices:[
+        {t:"Public speaking — I've been practicing a lot lately.", correct:true, fb:"Dürüst ve gelişim odaklı."},
+        {t:"I have no weakness.", correct:false, fb:"Gerçekçi değil."},
+        {t:"Sometimes I am lazy person who not want to do work.", correct:false, fb:"Dilbilgisi hatalı ve fazla samimi."}
+      ]},
+      { npc:"Where do you see yourself in five years?", choices:[
+        {t:"Growing into a leadership role here.", correct:true, fb:"Hedef odaklı ve doğal."},
+        {t:"I don't think about future things.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Maybe rich and famous somewhere else, who knows really.", correct:false, fb:"Şaka gibi algılanabilir, profesyonel değil."}
+      ]},
+      { npc:"How do you handle conflict with a coworker?", choices:[
+        {t:"I try to talk it out calmly first.", correct:true, fb:"Kısa, olgun ve doğal bir yaklaşım."},
+        {t:"I ignore problem and hope it go away by itself.", correct:false, fb:"Dilbilgisi hatalı ve olumsuz bir izlenim bırakır."},
+        {t:"Fight.", correct:false, fb:"Uygunsuz ve profesyonel değil."}
+      ]},
+      { npc:"Any questions for us?", choices:[
+        {t:"Yes — what does success look like in six months?", correct:true, fb:"Meraklı ve düşünceli bir soru."},
+        {t:"No.", correct:false, fb:"Fırsatı değerlendirmemiş olursun."},
+        {t:"How much money I get for this job exactly right now?", correct:false, fb:"Dilbilgisi hatalı ve zamanlaması yanlış."}
+      ]},
+    ]
+  },
+  { id:"phone", emoji:"📞", title:"Müşteri Hizmetleri", desc:"Telefonda bir sorunu bildir", cat:"gunluk",
+    steps:[
+      { npc:"Thanks for calling support, how can I help?", choices:[
+        {t:"Hi, I'm having an issue with my order.", correct:true, fb:"Net bir açılış cümlesi."},
+        {t:"Bad problem order.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Help.", correct:false, fb:"Çok kısa ve kaba."}
+      ]},
+      { npc:"Sorry to hear that. Order number?", choices:[
+        {t:"It's 48291.", correct:true, fb:"Kısa ve net."},
+        {t:"I not remember number now sorry about that.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Why you need my personal number for this problem exactly?", correct:false, fb:"Gereksiz savunmacı ve uzun."}
+      ]},
+      { npc:"Got it. What's the problem exactly?", choices:[
+        {t:"It arrived damaged.", correct:true, fb:"Kısa ve net bir açıklama."},
+        {t:"Box broken bad very much yes.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Everything about this whole situation is wrong somehow.", correct:false, fb:"Belirsiz ve gereksiz uzun."}
+      ]},
+      { npc:"I understand. Replacement or refund?", choices:[
+        {t:"A replacement, please.", correct:true, fb:"Net bir tercih."},
+        {t:"Money back now give.", correct:false, fb:"Kaba ve dilbilgisi hatalı."},
+        {t:"I don't know honestly whatever is easier for you to do.", correct:false, fb:"Karar vermek gerekiyor; net bir tercih daha yardımcı olur."}
+      ]},
+      { npc:"Sure, when did you place the order?", choices:[
+        {t:"Last Tuesday.", correct:true, fb:"Kısa ve yeterli bir cevap."},
+        {t:"Long time ago maybe I think last week or before that.", correct:false, fb:"Belirsiz ve gereksiz uzun."},
+        {t:"Order I make day.", correct:false, fb:"Dilbilgisi bozuk."}
+      ]},
+      { npc:"Perfect, we'll send that today. Anything else?", choices:[
+        {t:"No, that's everything — thanks!", correct:true, fb:"Doğal bir kapanış."},
+        {t:"Bye.", correct:false, fb:"Çok ani; teşekkür etmek daha doğal."},
+        {t:"That is all thing I need from you today thank you very much indeed.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+    ]
+  },
+  { id:"smalltalk", emoji:"☕", title:"Küçük Sohbet", desc:"Bir partide yeni biriyle tanış", cat:"sosyal",
+    steps:[
+      { npc:"Hi! I don't think we've met — I'm Sam.", choices:[
+        {t:"I'm Furkan, nice to meet you!", correct:true, fb:"Sıcak ve doğal bir tanışma."},
+        {t:"My name is call Furkan.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Who are you exactly and why are you talking to me right now?", correct:false, fb:"Fazla direkt ve garip."}
+      ]},
+      { npc:"How do you know the host?", choices:[
+        {t:"We used to work together. You?", correct:true, fb:"Doğal ve akıcı, karşılıklı soru soruyor."},
+        {t:"I know him from work long time before many years ago actually.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Not important.", correct:false, fb:"Sohbeti kapatan bir cevap."}
+      ]},
+      { npc:"What do you do these days?", choices:[
+        {t:"I'm a graphic designer. And you?", correct:true, fb:"Net ve karşılıklı ilgi gösteren bir cevap."},
+        {t:"I work in job.", correct:false, fb:"Çok belirsiz."},
+        {t:"Why you ask me this question about my job right now?", correct:false, fb:"Gereksiz savunmacı."}
+      ]},
+      { npc:"Have you always wanted to do that?", choices:[
+        {t:"Not really — I studied something totally different.", correct:true, fb:"Samimi ve doğal."},
+        {t:"Yes always since baby I know this.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"I don't want talk about it now.", correct:false, fb:"Beklenmedik ve garip bir tepki."}
+      ]},
+      { npc:"That's a cool path! Do you enjoy it?", choices:[
+        {t:"Most days, yeah.", correct:true, fb:"Kısa, gündelik ve doğal."},
+        {t:"It is very good job I like it so much every single day always.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Enjoy not word I use.", correct:false, fb:"Dilbilgisi bozuk."}
+      ]},
+      { npc:"Well, I should mingle a bit — great chatting with you!", choices:[
+        {t:"You too, enjoy the party!", correct:true, fb:"Doğal ve sıcak bir kapanış."},
+        {t:"Okay bye bye go now.", correct:false, fb:"Garip ve tekrarlı."},
+        {t:"Why you leaving so soon from talking with me?", correct:false, fb:"Sohbeti tuhaflaştıran bir tepki."}
+      ]},
+    ]
+  },
+  { id:"airport", emoji:"✈️", title:"Havaalanında", desc:"Check-in ve güvenlikte konuş", cat:"seyahat",
+    steps:[
+      { npc:"Good morning! Passport and boarding pass, please.", choices:[
+        {t:"Here you go.", correct:true, fb:"Kısa ve tam yerinde."},
+        {t:"Take it, this is my important document for you now.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Why you want passport from me?", correct:false, fb:"Garip ve dilbilgisi hatalı."}
+      ]},
+      { npc:"Window or aisle?", choices:[
+        {t:"Window, please.", correct:true, fb:"Net ve kısa bir tercih."},
+        {t:"Window seat I want very much if it possible for you.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Doesn't matter give me any one you have there.", correct:false, fb:"Biraz kaba; 'Either is fine' daha nazik."}
+      ]},
+      { npc:"Any bags to check in?", choices:[
+        {t:"Just this one.", correct:true, fb:"Kısa ve net."},
+        {t:"I have bag one only just this single one here.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Bags no.", correct:false, fb:"Doğal değil; 'No, I don't' demek daha doğru."}
+      ]},
+      { npc:"Here's your boarding pass — gate B12, boarding at 10:40.", choices:[
+        {t:"Thank you so much!", correct:true, fb:"Sıcak ve kısa bir kapanış."},
+        {t:"Okay I go now bye bye see you.", correct:false, fb:"Doğal olmayan bir kapanış."},
+        {t:"B12 where exactly is that located in this airport?", correct:false, fb:"Anlaşılır ama gereksiz uzun ve biraz kaba."}
+      ]},
+      { npc:"(At security) Please remove your laptop.", choices:[
+        {t:"Sure, one second.", correct:true, fb:"Kısa ve doğal bir cevap."},
+        {t:"Why I need do this exactly right now for you?", correct:false, fb:"Uygunsuz ve dilbilgisi hatalı."},
+        {t:"I don't want to do that.", correct:false, fb:"Bu bağlamda kabul edilemez."}
+      ]},
+      { npc:"All clear, have a safe flight!", choices:[
+        {t:"Thanks, you too!", correct:true, fb:"Doğal ve kısa bir karşılık."},
+        {t:"You also have very safe and pleasant flight experience too.", correct:false, fb:"Gereksiz uzun ve garip."},
+        {t:"Okay.", correct:false, fb:"Çok kısa ve soğuk kalıyor."}
+      ]},
+    ]
+  },
+  { id:"apartment", emoji:"🏠", title:"Ev Bakma", desc:"Kiralık daireyi gezerken soru sor", cat:"gunluk",
+    steps:[
+      { npc:"Welcome! Any questions so far?", choices:[
+        {t:"Is the rent negotiable?", correct:true, fb:"Doğal ve net bir soru."},
+        {t:"Price can change or no maybe?", correct:false, fb:"Akıcı değil."},
+        {t:"I want you to make it cheaper for me right now please.", correct:false, fb:"Fazla direkt."}
+      ]},
+      { npc:"A bit, depending on lease length. Anything else?", choices:[
+        {t:"Are utilities included?", correct:true, fb:"Çok yaygın bir soru."},
+        {t:"Electricity water included or not exactly?", correct:false, fb:"Doğal değil."},
+        {t:"Who pays for everything here in this apartment usually?", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"No, those are separate.", choices:[
+        {t:"Got it, thanks.", correct:true, fb:"Kısa ve doğal."},
+        {t:"Okay understand I now about this thing.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"That's a bit disappointing to hear honestly speaking right now.", correct:false, fb:"Gereksiz uzun ve fazla duygusal."}
+      ]},
+      { npc:"How's the neighborhood in terms of noise?", choices:[
+        {t:"Pretty quiet, actually.", correct:true, fb:"Kısa ve doğal cevap."},
+        {t:"Is loud here?", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"I really need to know everything about noise level here before deciding anything.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"Would you like to see the kitchen?", choices:[
+        {t:"Yes, please.", correct:true, fb:"Kısa ve nazik."},
+        {t:"Yes show.", correct:false, fb:"Emir kipi gibi duruyor."},
+        {t:"Kitchen not so important for me honestly at this point.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"So, are you interested in moving forward?", choices:[
+        {t:"Can I think it over?", correct:true, fb:"Kibar ve zaman isteyen doğal bir cevap."},
+        {t:"Maybe yes maybe no I not sure right now honestly.", correct:false, fb:"Dilbilgisi hatalı."},
+        {t:"Yes.", correct:false, fb:"Gerçek hayatta genelde düşünme süresi istenir; çok aceleci."}
+      ]},
+    ]
+  },
+  { id:"doctor", emoji:"🩺", title:"Doktor Randevusu", desc:"Şikayetini anlat, önerileri dinle", cat:"gunluk",
+    steps:[
+      { npc:"Good morning, what brings you in today?", choices:[
+        {t:"I've had a sore throat for a few days.", correct:true, fb:"Net ve doğal bir şikayet anlatımı."},
+        {t:"Throat problem bad me have.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"I don't know exactly, maybe something wrong somewhere in my body.", correct:false, fb:"Belirsiz."}
+      ]},
+      { npc:"Any fever or other symptoms?", choices:[
+        {t:"A slight fever, yeah.", correct:true, fb:"Kısa ve net."},
+        {t:"Fever I have small amount of it yes indeed.", correct:false, fb:"Gereksiz uzun."},
+        {t:"No.", correct:false, fb:"Fazla kısa, biraz daha detay vermek faydalı olur."}
+      ]},
+      { npc:"How long has this been going on?", choices:[
+        {t:"About three days.", correct:true, fb:"Net bir zaman ifadesi."},
+        {t:"Long time now since many day ago I think.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Time.", correct:false, fb:"Anlamsız kalıyor."}
+      ]},
+      { npc:"Are you allergic to any medication?", choices:[
+        {t:"Not that I know of.", correct:true, fb:"Doğal ve yaygın bir cevap kalıbı."},
+        {t:"I not know about allergy things really.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Allergy is very complicated subject that I have never really looked into carefully before.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"I'll prescribe some antibiotics. Take them twice a day.", choices:[
+        {t:"Got it, thank you.", correct:true, fb:"Kısa ve doğal bir kabul."},
+        {t:"Okay understand I will do exactly as you say to me now.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Twice?", correct:false, fb:"Anlaşılır ama fazla kısa ve belirsiz kalıyor."}
+      ]},
+      { npc:"Come back if it doesn't improve in a week.", choices:[
+        {t:"Will do, thanks so much.", correct:true, fb:"Doğal bir kapanış cümlesi."},
+        {t:"Okay bye.", correct:false, fb:"Fazla soğuk kalıyor."},
+        {t:"I will definitely come back here again if problem not go away completely after one full week.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+    ]
+  },
+  { id:"taxi", emoji:"🚕", title:"Taksi / Uber", desc:"Şoförle adres ve yol konuş", cat:"seyahat",
+    steps:[
+      { npc:"Hey, where are you headed?", choices:[
+        {t:"Downtown, near the station.", correct:true, fb:"Net ve kısa bir adres tarifi."},
+        {t:"I go place near station area maybe you know it.", correct:false, fb:"Belirsiz ve gereksiz uzun."},
+        {t:"Station.", correct:false, fb:"Çok kısa, biraz daha detay vermek faydalı."}
+      ]},
+      { npc:"Got it. Any preferred route, or should I just take the highway?", choices:[
+        {t:"Highway's fine.", correct:true, fb:"Kısa ve net bir onay."},
+        {t:"I not care about route you choose is okay for me.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Please take whichever route you personally think is fastest at this hour.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"How's your day going so far?", choices:[
+        {t:"Pretty good, thanks — you?", correct:true, fb:"Doğal ve karşılıklı bir sohbet açılışı."},
+        {t:"Day is good for me today very much thank you so much.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Fine.", correct:false, fb:"Fazla kısa, sohbeti sürdürmez."}
+      ]},
+      { npc:"Traffic's a bit heavy today, might take ten extra minutes.", choices:[
+        {t:"No worries, I'm not in a rush.", correct:true, fb:"Rahat ve doğal bir tepki."},
+        {t:"That is bad news for me I very much dislike traffic always.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Hurry.", correct:false, fb:"Kaba bir talep."}
+      ]},
+      { npc:"We're almost there — which side should I pull over?", choices:[
+        {t:"The right side is great.", correct:true, fb:"Net ve doğal."},
+        {t:"Left side maybe or right side either is okay for me actually.", correct:false, fb:"Gereksiz uzun ve kararsız."},
+        {t:"Here.", correct:false, fb:"Fazla belirsiz."}
+      ]},
+      { npc:"Here we are! That'll be $12.", choices:[
+        {t:"Here you go, keep the change.", correct:true, fb:"Doğal ve nazik bir ödeme cümlesi."},
+        {t:"Take money now here from me please.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Twelve dollars is quite a lot for this short distance in my opinion.", correct:false, fb:"Gereksiz ve tartışmacı."}
+      ]},
+    ]
+  },
+  { id:"cafe", emoji:"🧋", title:"Kahve Dükkanında", desc:"Sipariş ver ve küçük bir sohbet et", cat:"yemek",
+    steps:[
+      { npc:"Hi, what can I get started for you?", choices:[
+        {t:"A medium latte, please.", correct:true, fb:"Net ve kısa bir sipariş."},
+        {t:"Coffee.", correct:false, fb:"Fazla belirsiz; boyut/tür belirtmek daha doğal."},
+        {t:"I would like to order something warm and milky if that's possible for you to make.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"For here or to go?", choices:[
+        {t:"To go, thanks.", correct:true, fb:"Kısa ve net."},
+        {t:"I take it with me leaving now from here.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"Doesn't matter really whichever is easier for you honestly.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"Anything to eat with that?", choices:[
+        {t:"Just a croissant.", correct:true, fb:"Kısa ve net."},
+        {t:"No.", correct:false, fb:"Nazik bir alternatif tercih edilebilir ama bağlama göre kabul edilir; yine de kısa."},
+        {t:"Maybe something sweet but I am not totally sure what exactly I want right now.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"That'll be $6.50 — name for the order?", choices:[
+        {t:"Furkan.", correct:true, fb:"Kısa ve tam yerinde."},
+        {t:"My name is call Furkan for order now.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"You can write down whatever name you like on the cup.", correct:false, fb:"Gereksiz ve garip."}
+      ]},
+      { npc:"Great, it'll be ready in a few minutes.", choices:[
+        {t:"Perfect, thank you!", correct:true, fb:"Kısa ve doğal bir teşekkür."},
+        {t:"Okay I wait here now for long time until it ready.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Few minutes how many exactly minutes is that going to be?", correct:false, fb:"Gereksiz ve biraz sabırsız."}
+      ]},
+      { npc:"(Barista calls) Latte for Furkan!", choices:[
+        {t:"That's me, thanks!", correct:true, fb:"Doğal ve kısa bir cevap."},
+        {t:"Yes that is me here right now come get it.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Me.", correct:false, fb:"Çok kısa ve kaba durabilir."}
+      ]},
+    ]
+  },
+  { id:"gym", emoji:"🏋️", title:"Spor Salonunda Üyelik", desc:"Üyelik seçeneklerini konuş", cat:"gunluk",
+    steps:[
+      { npc:"Hi, are you looking to sign up for a membership?", choices:[
+        {t:"Yes, I'd like to know more about your plans.", correct:true, fb:"Net ve doğal bir açılış."},
+        {t:"Maybe yes I think about it a little bit right now honestly.", correct:false, fb:"Gereksiz uzun ve kararsız."},
+        {t:"Membership give me.", correct:false, fb:"Dilbilgisi bozuk."}
+      ]},
+      { npc:"We have monthly and annual options. Which fits you better?", choices:[
+        {t:"Monthly, for now.", correct:true, fb:"Net ve kısa bir tercih."},
+        {t:"I not sure yet which one is better choice for my situation.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Any.", correct:false, fb:"Fazla belirsiz."}
+      ]},
+      { npc:"Do you need a locker as well?", choices:[
+        {t:"Yes, that'd be great.", correct:true, fb:"Kısa ve doğal."},
+        {t:"Locker I need one for sure yes please give me now.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"I don't think I really need one but maybe I should get one anyway just in case.", correct:false, fb:"Gereksiz uzun."}
+      ]},
+      { npc:"Great, do you have any injuries we should know about?", choices:[
+        {t:"Nothing major, just a minor knee issue.", correct:true, fb:"Net ve yeterli bir açıklama."},
+        {t:"No.", correct:false, fb:"Kısa; bağlama göre biraz daha bilgi vermek faydalı olurdu."},
+        {t:"Injury is complicated topic I don't really want to discuss in detail here today.", correct:false, fb:"Gereksiz uzun ve kaçamak."}
+      ]},
+      { npc:"Got it, we'll note that. Want a quick tour of the equipment?", choices:[
+        {t:"Sure, that'd be helpful.", correct:true, fb:"Doğal ve nazik bir onay."},
+        {t:"Tour show me now quickly please come on.", correct:false, fb:"Dilbilgisi bozuk."},
+        {t:"I already know everything about gym equipment so no need really for that.", correct:false, fb:"Gereksiz uzun ve kibirli görünebilir."}
+      ]},
+      { npc:"Perfect, follow me this way.", choices:[
+        {t:"Lead the way!", correct:true, fb:"Doğal, samimi bir ifade."},
+        {t:"Okay I follow you now to that place over there.", correct:false, fb:"Gereksiz uzun."},
+        {t:"Fine.", correct:false, fb:"Fazla soğuk."}
+      ]},
+    ]
+  },
+];
+
+const READINGS = [
+  {
+    id:"r1", title:"A Weekend Trip", emoji:"🧳", level:"B1",
+    passage:"Last weekend, Elena decided to visit a small town near the coast. She took an early train and arrived before noon. The town was quiet, with narrow streets and old stone houses. She spent most of the afternoon walking along the beach and trying local seafood at a tiny restaurant. In the evening, she met a group of travelers at her hostel, and they talked for hours about their favorite places to visit. Elena said it was one of the most relaxing weekends she'd had in a long time.",
+    questions:[
+      { q:"When did Elena arrive in the town?", options:["In the evening","Before noon","At midnight"], correct:1 },
+      { q:"What did she do in the afternoon?", options:["She worked at a hostel","She walked on the beach and ate seafood","She took a train home"], correct:1 },
+      { q:"Who did she talk to in the evening?", options:["Local restaurant owners","A group of travelers","Her family"], correct:1 },
+    ]
+  },
+  {
+    id:"r2", title:"Working From Home", emoji:"💻", level:"B1-B2",
+    passage:"Since switching to remote work two years ago, Mark has noticed both benefits and challenges. On one hand, he saves almost an hour every day by not commuting, and he can spend more time with his family. On the other hand, he sometimes finds it hard to separate work from personal life, especially when his laptop is always nearby. To deal with this, he now tries to keep a strict schedule: he starts work at nine, takes a real lunch break away from his desk, and shuts his laptop completely by six in the evening.",
+    questions:[
+      { q:"What is one benefit Mark mentions about remote work?", options:["He earns more money","He saves time by not commuting","He works fewer hours"], correct:1 },
+      { q:"What challenge does he mention?", options:["Separating work from personal life","Finding a job","Traveling too much"], correct:0 },
+      { q:"What does he do to manage this challenge?", options:["He quit his job","He keeps a strict daily schedule","He works only on weekends"], correct:1 },
+    ]
+  },
+  {
+    id:"r3", title:"A Customer Review", emoji:"⭐", level:"B1",
+    passage:"I ordered a pair of running shoes from this website last month, and overall I'm quite happy with them. The delivery was faster than expected — it only took three days. The shoes themselves are comfortable and true to size, though the color was slightly different from the photos online. I reached out to customer support about a minor issue with the packaging, and they responded within a few hours and offered a small discount on my next order. I would definitely recommend this store to a friend.",
+    questions:[
+      { q:"How long did delivery take?", options:["A few hours","Three days","Two weeks"], correct:1 },
+      { q:"What was slightly different from the photos?", options:["The size","The color","The price"], correct:1 },
+      { q:"How did customer support respond?", options:["They ignored the message","They responded quickly and gave a discount","They refused a refund"], correct:1 },
+    ]
+  },
+  {
+    id:"r4", title:"An Office Email", emoji:"📧", level:"B2",
+    passage:"Hi team, I wanted to give a quick update on the project timeline. We're currently a few days behind schedule due to some unexpected issues with the design files, but the development team has already started working on a solution. I'd like to schedule a short meeting tomorrow afternoon to go over the next steps and make sure everyone is on the same page. Please let me know if 3 PM works for you, or suggest another time that fits better. Thanks for your patience and hard work so far.",
+    questions:[
+      { q:"Why is the project behind schedule?", options:["The team is on vacation","There were issues with design files","The budget was cut"], correct:1 },
+      { q:"What does the writer want to schedule?", options:["A team lunch","A short meeting","A vacation"], correct:1 },
+      { q:"What does the writer ask the team to do?", options:["Confirm if 3 PM works","Finish the project today","Cancel the meeting"], correct:0 },
+    ]
+  },
+  {
+    id:"r5", title:"Learning a New Skill", emoji:"🎸", level:"B1-B2",
+    passage:"Two months ago, Daniel decided to learn how to play the guitar. At first, it was frustrating — his fingers hurt, and simple chords felt impossible. He almost gave up during the first week. Instead of quitting, he set a small goal: just fifteen minutes of practice every day, no matter how tired he was. Slowly, things started to click. Now he can play a few full songs, and he says the key was consistency, not talent. He plans to start learning a second instrument next year.",
+    questions:[
+      { q:"What was Daniel's first reaction to learning guitar?", options:["He found it easy","He found it frustrating","He didn't try at all"], correct:1 },
+      { q:"What was his strategy to keep going?", options:["Practicing fifteen minutes daily","Taking a break for a month","Hiring a private teacher"], correct:0 },
+      { q:"What does he believe was the key to his progress?", options:["Natural talent","Consistency","Expensive equipment"], correct:1 },
+    ]
+  },
+];
+
+/* ---------------- STATE ---------------- */
+const STORAGE_KEY = "ip_state_v2";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { completedScenarios:{}, wordProgress:{}, completedReadings:{}, lastVisit:null, streak:0 };
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+let state = loadState();
+
+function updateStreak(){
+  const today = new Date().toDateString();
+  if(state.lastVisit !== today){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    state.streak = (state.lastVisit === y.toDateString()) ? state.streak + 1 : 1;
+    state.lastVisit = today;
+    saveState();
+  }
+}
+updateStreak();
+
+/* ---------------- NAV ---------------- */
+function showScreen(name){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+name).classList.add("active");
+  document.querySelectorAll(".navbar button").forEach(b=>b.classList.remove("active"));
+  const navMap = {home:"home", scenarios:"scenarios", flash:"flash", readings:"readings", words:"words",
+    play:"scenarios", done:"scenarios", "flash-done":"flash", "reading-play":"readings", "reading-done":"readings"};
+  const nb = document.querySelector('.navbar button[data-nav="'+(navMap[name]||name)+'"]');
+  if(nb) nb.classList.add("active");
+  if(name==="home") renderHome();
+  if(name==="scenarios") renderScenarioList();
+  if(name==="readings") renderReadingList();
+  if(name==="words") renderWordsScreen();
+}
+
+function renderHome(){
+  document.getElementById("stat-streak").textContent = state.streak;
+  const doneS = Object.keys(state.completedScenarios).length;
+  document.getElementById("stat-scenarios").textContent = doneS + "/" + SCENARIOS.length;
+  const known = Object.values(state.wordProgress).filter(v=>v.known).length;
+  document.getElementById("stat-words").textContent = known;
+  const doneR = Object.keys(state.completedReadings).length;
+  document.getElementById("stat-readings").textContent = doneR + "/" + READINGS.length;
+}
+
+/* ---------------- SCENARIOS ---------------- */
+function renderScenarioList(){
+  const el = document.getElementById("scenario-list");
+  el.innerHTML = "";
+  SCENARIOS.forEach(s=>{
+    const doneFlag = state.completedScenarios[s.id];
+    const div = document.createElement("div");
+    div.className = "scenario-item";
+    div.style.setProperty('--cat-color', CAT_COLORS[s.cat]);
+    div.onclick = ()=>playScenario(s.id);
+    div.innerHTML = `<div class="emoji">${s.emoji}</div>
+      <div class="info">
+        <div class="title">${s.title}</div>
+        <div class="desc">${s.desc}</div>
+        <span class="cat">${CAT_LABELS[s.cat]}</span>
+        ${doneFlag ? '<div class="done">✓ Tamamlandı</div>' : ''}
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+let playCtx = null;
+function playScenario(id){
+  const scenario = SCENARIOS.find(s=>s.id===id);
+  playCtx = { scenario, stepIndex:0, correctCount:0 };
+  showScreen("play");
+  document.getElementById("play-title").textContent = scenario.emoji + " " + scenario.title;
+  renderStep();
+}
+function exitScenario(){ showScreen("scenarios"); }
+
+function renderStep(){
+  const { scenario, stepIndex } = playCtx;
+  const step = scenario.steps[stepIndex];
+  document.getElementById("play-progress").style.width = Math.round((stepIndex/scenario.steps.length)*100) + "%";
+  const body = document.getElementById("play-body");
+  body.innerHTML = `
+    <div class="npc-role">Karşındaki kişi</div>
+    <div class="npc-bubble">${step.npc}</div>
+    <div id="choices"></div>
+    <div id="feedback-area"></div>
+    <button class="btn" id="next-btn" style="display:none;" onclick="nextStep()">Devam Et →</button>
+  `;
+  const choicesEl = document.getElementById("choices");
+  const shuffled = step.choices.map((c,i)=>({...c, i})).sort(()=>Math.random()-0.5);
+  shuffled.forEach(c=>{
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = c.t;
+    btn.onclick = ()=>selectChoice(c, btn);
+    choicesEl.appendChild(btn);
+  });
+}
+function selectChoice(choice, btnEl){
+  document.querySelectorAll("#choices .choice").forEach(b=>b.onclick=null);
+  btnEl.classList.add(choice.correct ? "correct":"wrong");
+  const fb = document.getElementById("feedback-area");
+  fb.innerHTML = `<div class="feedback ${choice.correct?'':'bad'}">${choice.correct ? '✅ ' : '💡 '}${choice.fb}</div>`;
+  if(choice.correct) playCtx.correctCount++;
+  document.getElementById("next-btn").style.display = "block";
+}
+function nextStep(){
+  playCtx.stepIndex++;
+  if(playCtx.stepIndex >= playCtx.scenario.steps.length){
+    state.completedScenarios[playCtx.scenario.id] = true;
+    saveState();
+    document.getElementById("done-summary").textContent =
+      `"${playCtx.scenario.title}" senaryosunu tamamladın. ${playCtx.scenario.steps.length} adımdan ${playCtx.correctCount} tanesinde en doğal cevabı seçtin.`;
+    showScreen("done");
+  } else {
+    renderStep();
+  }
+}
+
+/* ---------------- FLASHCARDS ---------------- */
+let flashSession = null;
+function startFlashcards(){
+  const pool = VOCAB.map((v,i)=>({idx:i, known: state.wordProgress[i]?.known || false}));
+  const notKnown = pool.filter(p=>!p.known);
+  const source = notKnown.length ? notKnown : pool;
+  const shuffled = source.sort(()=>Math.random()-0.5).slice(0, Math.min(10, source.length));
+  flashSession = { items: shuffled, pos:0, correct:0, revealed:false };
+  showScreen("flash");
+  renderFlash();
+}
+function renderFlash(){
+  const { items, pos } = flashSession;
+  document.getElementById("flash-counter").textContent = `Kart ${pos+1} / ${items.length}`;
+  document.getElementById("flash-progress").style.width = Math.round((pos/items.length)*100) + "%";
+  const word = VOCAB[items[pos].idx];
+  document.getElementById("flash-front").textContent = word[0];
+  document.getElementById("flash-example").style.display = "none";
+  document.getElementById("flash-example").textContent = "";
+  document.getElementById("flash-hint").style.display = "block";
+  document.getElementById("flash-hint").textContent = "✨ Anlamı görmek için karta dokun";
+  document.getElementById("flash-actions").style.display = "none";
+  flashSession.revealed = false;
+}
+function flipCard(){
+  if(flashSession.revealed) return;
+  const word = VOCAB[flashSession.items[flashSession.pos].idx];
+  document.getElementById("flash-front").textContent = word[0] + " — " + word[1];
+  document.getElementById("flash-example").textContent = word[2];
+  document.getElementById("flash-example").style.display = "block";
+  document.getElementById("flash-hint").style.display = "none";
+  document.getElementById("flash-actions").style.display = "grid";
+  flashSession.revealed = true;
+}
+function answerCard(knew){
+  const idx = flashSession.items[flashSession.pos].idx;
+  state.wordProgress[idx] = { known: knew };
+  saveState();
+  if(knew) flashSession.correct++;
+  flashSession.pos++;
+  if(flashSession.pos >= flashSession.items.length){
+    document.getElementById("flash-done-summary").textContent =
+      `${flashSession.items.length} karttan ${flashSession.correct} tanesini biliyordun. Böyle devam!`;
+    showScreen("flash-done");
+  } else {
+    renderFlash();
+  }
+}
+
+/* ---------------- READINGS ---------------- */
+function renderReadingList(){
+  const el = document.getElementById("reading-list");
+  el.innerHTML = "";
+  READINGS.forEach(r=>{
+    const done = state.completedReadings[r.id];
+    const div = document.createElement("div");
+    div.className = "reading-item";
+    div.onclick = ()=>playReading(r.id);
+    div.innerHTML = `<div class="title">${r.emoji} ${r.title}</div>
+      <div class="meta">Seviye: ${r.level}${done ? ` · ✓ Tamamlandı (${done.score}/${done.total})` : ''}</div>`;
+    el.appendChild(div);
+  });
+}
+let readingCtx = null;
+function playReading(id){
+  const reading = READINGS.find(r=>r.id===id);
+  readingCtx = { reading, answers:new Array(reading.questions.length).fill(null) };
+  showScreen("reading-play");
+  document.getElementById("reading-title").textContent = reading.emoji + " " + reading.title;
+  document.getElementById("reading-passage").textContent = reading.passage;
+  const qEl = document.getElementById("reading-questions");
+  qEl.innerHTML = "";
+  reading.questions.forEach((q, qi)=>{
+    const block = document.createElement("div");
+    block.className = "q-block";
+    block.innerHTML = `<div class="q-text">${qi+1}. ${q.q}</div>`;
+    q.options.forEach((opt, oi)=>{
+      const btn = document.createElement("button");
+      btn.className = "choice";
+      btn.textContent = opt;
+      btn.onclick = ()=>{
+        readingCtx.answers[qi] = oi;
+        block.querySelectorAll(".choice").forEach(b=>b.style.borderColor = "var(--border)");
+        btn.style.borderColor = "var(--accent)";
+      };
+      block.appendChild(btn);
+    });
+    qEl.appendChild(block);
+  });
+}
+function submitReading(){
+  const { reading, answers } = readingCtx;
+  if(answers.includes(null)){
+    alert("Lütfen tüm soruları cevapla.");
+    return;
+  }
+  let score = 0;
+  reading.questions.forEach((q,i)=>{ if(answers[i]===q.correct) score++; });
+  state.completedReadings[reading.id] = { score, total: reading.questions.length };
+  saveState();
+  document.getElementById("reading-done-summary").textContent =
+    `"${reading.title}" metnini tamamladın.`;
+  document.getElementById("reading-score-pill").textContent = `${score} / ${reading.questions.length} doğru`;
+  showScreen("reading-done");
+}
+
+/* ---------------- WORD LIST / PROGRESS SCREEN ---------------- */
+function renderWordsScreen(){
+  renderWordList();
+  renderScenarioProgress();
+  renderReadingProgress();
+}
+function renderWordList(){
+  const card = document.getElementById("word-list-card");
+  if(!Object.keys(state.wordProgress).length){
+    card.innerHTML = '<div class="empty">Henüz kelime kartı çalışmadın.</div>';
+    return;
+  }
+  let html = "";
+  VOCAB.forEach((v,i)=>{
+    const prog = state.wordProgress[i];
+    if(!prog) return;
+    const tag = prog.known ? '<span class="tag known">öğrenildi</span>' : '<span class="tag learning">tekrar gerekiyor</span>';
+    html += `<div class="word-row"><div><span class="word-en">${v[0]}</span>${tag}</div><div class="word-tr">${v[1]}</div></div>`;
+  });
+  card.innerHTML = html || '<div class="empty">Henüz kelime kartı çalışmadın.</div>';
+}
+function renderScenarioProgress(){
+  const card = document.getElementById("scenario-progress-card");
+  const done = SCENARIOS.filter(s=>state.completedScenarios[s.id]);
+  if(!done.length){ card.innerHTML = '<div class="empty">Henüz senaryo tamamlamadın.</div>'; return; }
+  card.innerHTML = `<div class="badge-row">${done.map(s=>`<span class="tag known">${s.emoji} ${s.title}</span>`).join('')}</div>`;
+}
+function renderReadingProgress(){
+  const card = document.getElementById("reading-progress-card");
+  const ids = Object.keys(state.completedReadings);
+  if(!ids.length){ card.innerHTML = '<div class="empty">Henüz metin tamamlamadın.</div>'; return; }
+  card.innerHTML = ids.map(id=>{
+    const r = READINGS.find(x=>x.id===id);
+    const d = state.completedReadings[id];
+    return `<div class="word-row"><div class="word-en">${r.emoji} ${r.title}</div><div class="word-tr">${d.score}/${d.total}</div></div>`;
+  }).join('');
+}
+
+/* ---------------- INIT ---------------- */
+renderHome();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

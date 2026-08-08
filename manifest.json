@@ -1,0 +1,14 @@
+{
+  "name": "İngilizce Pratik",
+  "short_name": "İngilizce Pratik",
+  "description": "B1-B2 seviyesi İngilizce konuşma pratiği: senaryolar ve kelime kartları",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#3366e6",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
